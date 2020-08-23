@@ -5,10 +5,16 @@ namespace PointOfSaleStateManagement.Data
 {
     public class Sale
     {
+        private readonly List<Change> _change = new List<Change>();
+        private readonly List<Payment> _payments = new List<Payment>();
+
         public int Id { get; }
+        public double AmountPaid { get; private set; }
+        public double ChangeGiven { get; private set; }
+        public double SubTotal { get; set; }
+
         public IReadOnlyList<SaleItem> SaleItems { get; set; }
-        public SaleState State = SaleState.Open;
-        public double TotalAmount { get; private set; }
+        public double Balance { get; private set; }
         public int TotalItems { get; private set; }
 
         public Sale(int id)
@@ -17,9 +23,21 @@ namespace PointOfSaleStateManagement.Data
             InitializeSaleItems();
         }
 
+        public void AddChange(Change change)
+        {
+            _change.Add(change);
+            UpdateAmounts();
+        }
+
+        public void AddPayment(Payment payment)
+        {
+            _payments.Add(payment);
+            UpdateAmounts();
+        }
+
         public void Cancel()
         {
-            State = SaleState.Cancelled;
+            //!!!
         }
 
         public void UpdateSaleItem()
@@ -27,8 +45,7 @@ namespace PointOfSaleStateManagement.Data
             if (SaleItems == null)
             { return; }
 
-            UpdateTotalAmount();
-            UpdateTotalItems();
+            UpdateAmounts();
         }
 
         private void InitializeSaleItems()
@@ -42,9 +59,33 @@ namespace PointOfSaleStateManagement.Data
             };
         }
 
-        private void UpdateTotalAmount()
+        private void UpdateAmounts()
         {
-            TotalAmount = SaleItems.Sum(i => i.TotalPrice);
+            UpdateTotalItems();
+            UpdateSubTotal();
+            UpdateAmountPaid();
+            UpdateChangeGiven();
+            UpdateBalance();
+        }
+
+        private void UpdateAmountPaid()
+        {
+            AmountPaid = _payments.Sum(i => i.Amount);
+        }
+
+        private void UpdateChangeGiven()
+        {
+            ChangeGiven = _change.Sum(i => i.Amount);
+        }
+
+        private void UpdateBalance()
+        {
+            Balance = AmountPaid - SubTotal - ChangeGiven;
+        }
+
+        private void UpdateSubTotal()
+        {
+            SubTotal = SaleItems.Sum(i => i.TotalPrice);
         }
 
         private void UpdateTotalItems()

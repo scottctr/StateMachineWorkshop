@@ -42,17 +42,23 @@
                     </tr>
                 }
             }
-
         </table>
 
         <br />
+        
+        <div>
+            <div><input type="text" inputmode="numeric" @onchange="PaymentAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, _sale.Balance * -1).ToString("C"))" /><button @onclick="AddPayment" style="width: 120px">Add Payment</button></div>
+            <div><input type="text" inputmode="numeric" @onchange="ChangeAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, _sale.Balance).ToString("C"))"/><button @onclick="GiveChange" style="width: 120px">Give Change</button></div>
+        </div>
+        
+        <br/>
 
         <table>
-            <tr><td><b>Items:</b></td><td>@_sale.TotalItems.ToString()</td></tr>
-            <tr><td><b>Sub-Total:</b></td><td>@_sale.TotalAmount.ToString("C")</td></tr>
-            <tr><td><b>Payments:</b></td><td>$0.00</td></tr>
-            <tr><td><b>Change:</b></td><td>$0.00</td></tr>
-            <tr style="text-align: right; text-decoration: underline"><td></td><td></td><td><b>Balance:</b></td><td style="text-align: right"><i>@_sale.TotalAmount.ToString("C")</i></td></tr>
+            <tr><td><b>Items:</b></td><td style="text-align: right">@_sale.TotalItems.ToString()</td></tr>
+            <tr><td><b>Sub-Total:</b></td><td style="text-align: right">@_sale.SubTotal.ToString("C")</td></tr>
+            <tr><td><b>Payments:</b></td><td style="text-align: right">@_sale.AmountPaid.ToString("C")</td></tr>
+            <tr><td><b>Change:</b></td><td style="text-align: right">@_sale.ChangeGiven.ToString("C")</td></tr>
+            <tr style="text-align: right; text-decoration: underline"><td></td><td></td><td><b>Balance:</b></td><td style="text-align: right"><i>@_sale.Balance.ToString("C")</i></td></tr>
         </table>
     </div>
 
@@ -60,7 +66,7 @@
 
     <div class="order-actions" style="display: flex; align-items: center; text-align: center; justify-content: center">
         <button style="width: 120px; margin: 15px" @onclick="Cancel">Cancel</button>
-        <button style="width: 120px; margin: 15px">Pay</button>
+        <button style="width: 120px; margin: 15px">Payment</button>
         <button style="width: 120px; margin: 15px">Give Change</button>
         <button style="width: 120px; margin: 15px" @onclick="CreateNewSale">New Sale</button>
     </div>
