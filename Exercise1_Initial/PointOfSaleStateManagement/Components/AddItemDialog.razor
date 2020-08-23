@@ -1,0 +1,43 @@
+﻿@using System.Diagnostics
+
+@if (ShowDialog)
+{
+    <div class="modal fade show d-block" id="exampleModal" tabindex="-1" role="dialog" style="width: 60%">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="titleLabel">Add Item</h5>
+                    <button type="button" class="close" @onclick="@Close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table>
+                        <tr>
+                            <td><b>Item</b></td>
+                            <td><b>Qty</b></td>
+                            <td></td>
+                            <td><b>Each</b></td>
+                            <td><b>Total</b></td>
+                        </tr>
+                        @{
+                            foreach (var saleItem in SaleItems)
+                            {
+                                <tr @key=saleItem>
+                                    <td>@saleItem.Product.Name</td>
+                                    <td>
+                                        <input type="number" @bind="@saleItem.Quantity" min="0" style="width: 65px" />
+                                    </td>
+                                    <td>@saleItem.Product.UnitPrice.ToString("C")</td>
+                                    <td>@saleItem.Product.UnitName</td>
+                                    <td>@saleItem.TotalPrice.ToString("C")</td>
+                                </tr>
+                            }
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

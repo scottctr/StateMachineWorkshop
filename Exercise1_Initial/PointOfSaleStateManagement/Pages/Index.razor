@@ -1,0 +1,66 @@
+﻿@page "/"
+
+<div>
+    <img style="vertical-align: middle" src="https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-505x400.jpg" alt="Pop's Store and Gas Station - Final Image" width="189" height="150" srcset="https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-505x400.jpg 505w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-300x238.jpg 300w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h.jpg 884w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-32x25.jpg 32w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-50x40.jpg 50w" sizes="(max-width: 505px) 100vw, 505px" />
+    <span style="font-size: 66px; color: brown">Pop's Gas and Stuff</span>
+</div>
+
+<hr>
+
+<div id="order-header" class="order-header">
+        <div class="row">
+            <div class="column">
+                <p><b>Order #:</b> @_sale.Id.ToString()</p>
+                @*<p><b>State: <span style="background-color: bisque; color: red">@_sale.State</span></b></p>*@
+            </div>
+            <div class="column" style="text-align: right">@DateTime.Now.ToShortDateString() @DateTime.Now.ToShortTimeString()</div>
+        </div>
+    </div>
+
+    <br />
+
+    <div id="order-details" class="order-details" style="width: 450px; margin: auto">
+        <table class="sale-items">
+            <tr class="border_bottom">
+                <th><b>Item</b></th>
+                <th><b>Qty</b></th>
+                <th />
+                <th><b>Each</b></th>
+                <th><b>Total</b></th>
+            </tr>
+            @{
+                foreach (var saleItem in _sale.SaleItems)
+                {
+                    <tr @key=saleItem>
+                        <td>@saleItem.Product.Name</td>
+                        <td>
+                            <input type="number" @bind="@saleItem.Quantity" min="0" style="width: 65px" />
+                        </td>
+                        <td>@saleItem.Product.UnitName</td>
+                        <td style="text-align: right">@saleItem.Product.UnitPrice.ToString("C")</td>
+                        <td style="text-align: right">@saleItem.TotalPrice.ToString("C")</td>
+                    </tr>
+                }
+            }
+
+        </table>
+
+        <br />
+
+        <table>
+            <tr><td><b>Items:</b></td><td>@_sale.TotalItems.ToString()</td></tr>
+            <tr><td><b>Sub-Total:</b></td><td>@_sale.TotalAmount.ToString("C")</td></tr>
+            <tr><td><b>Payments:</b></td><td>$0.00</td></tr>
+            <tr><td><b>Change:</b></td><td>$0.00</td></tr>
+            <tr style="text-align: right; text-decoration: underline"><td></td><td></td><td><b>Balance:</b></td><td style="text-align: right"><i>@_sale.TotalAmount.ToString("C")</i></td></tr>
+        </table>
+    </div>
+
+    <br />
+
+    <div class="order-actions" style="display: flex; align-items: center; text-align: center; justify-content: center">
+        <button style="width: 120px; margin: 15px" @onclick="Cancel">Cancel</button>
+        <button style="width: 120px; margin: 15px">Pay</button>
+        <button style="width: 120px; margin: 15px">Give Change</button>
+        <button style="width: 120px; margin: 15px" @onclick="CreateNewSale">New Sale</button>
+    </div>
