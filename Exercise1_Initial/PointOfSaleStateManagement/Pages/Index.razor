@@ -34,7 +34,7 @@
                     <tr @key=saleItem>
                         <td>@saleItem.Product.Name</td>
                         <td>
-                            <input type="number" @bind="@saleItem.Quantity" min="0" style="width: 65px" />
+                            <input type="number" value="@saleItem.Quantity" @onchange="@(e => ItemQuantityChanged(e.Value, saleItem))" min="0" style="width: 65px" />
                         </td>
                         <td>@saleItem.Product.UnitName</td>
                         <td style="text-align: right">@saleItem.Product.UnitPrice.ToString("C")</td>
@@ -64,9 +64,24 @@
 
     <br />
 
-    <div class="order-actions" style="display: flex; align-items: center; text-align: center; justify-content: center">
-        <button style="width: 120px; margin: 15px" @onclick="Cancel">Cancel</button>
-        <button style="width: 120px; margin: 15px">Payment</button>
-        <button style="width: 120px; margin: 15px">Give Change</button>
-        <button style="width: 120px; margin: 15px" @onclick="CreateNewSale">New Sale</button>
-    </div>
+<div class="order-actions" style="display: flex; align-items: center; text-align: center; justify-content: center">
+    <button style="width: 120px; margin: 15px" @onclick="Cancel">Cancel</button>
+    <button style="width: 120px; margin: 15px" @onclick="CreateNewSale">New Sale</button>
+</div>
+
+<hr/>
+
+<div style="background-color: black; color: white; width: 60%">
+    <table>
+        @{
+            foreach (var entry in _log)
+            {
+                <tr @key=entry>
+                    <td>@entry.Id</td>
+                    <td>@entry.Timestamp.ToShortTimeString()</td>
+                    <td>@entry.Entry</td>
+                </tr>
+            }
+        }
+    </table>
+</div>

@@ -2,6 +2,7 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: whitesmoke;
 }
 
 a, .btn-link {
@@ -155,9 +156,9 @@ app {
 
 .order-actions {
     height: 55px;
-    width: 60%;
+    width: 40%;
     border-color: #3a0647;
-    margin-left: 20%;
+    margin-left: 30%;
     background-color: #26b050;
 }
 
