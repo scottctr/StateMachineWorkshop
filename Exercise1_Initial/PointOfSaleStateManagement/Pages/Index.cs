@@ -25,7 +25,12 @@ namespace PointOfSaleStateManagement.Pages
 
         private void AddItem()
         {
-            var newSaleItem = new SaleItem (_sale, _productList[_selectedProductId - 1], quantity: 1);
+            AddItem(_selectedProductId - 1, quantity: 1);
+        }
+
+        private void AddItem(int productId, int quantity)
+        {
+            var newSaleItem = new SaleItem(_sale, _productList[productId - 1], quantity);
 
             var result = _sale.AddItem(newSaleItem);
             if (result.WasSuccess)
@@ -116,10 +121,10 @@ namespace PointOfSaleStateManagement.Pages
 
         private void InitializeProductList()
         {
-            _productList.Add(new Product(1, "Fuel", "Gallon", "Gallons", 2.00));
-            _productList.Add(new Product(2, "Oil", "Can", "Cans", 3.50));
-            _productList.Add(new Product(3, "Soda", "Can", "Cans", 1.00 ));
-            _productList.Add(new Product(4, "Chips", "Bag", "Bags", 1.50));
+            _productList.Add(new Product(1, "Fuel", "Gallon", "Gallons", 2.00, imageClassName: "gas-pump"));
+            _productList.Add(new Product(2, "Oil", "Can", "Cans", 3.50, imageClassName: "oil-can"));
+            _productList.Add(new Product(3, "Soda", "Can", "Cans", 1.00, imageClassName: "beer"));
+            _productList.Add(new Product(4, "Chips", "Bag", "Bags", 1.50, imageClassName: "cookie"));
 
             _selectedProductId = _productList.First().Id;
         }

@@ -26,55 +26,53 @@
 
 <br />
 
-<div id="order-details" class="order-details" style="width: 500px; margin: auto">
+<div id="order-details" class="order-details" style="width: 600px; margin: auto">
     <div>
-        <select @bind="@_selectedProductId">
-            <option>--Select Product--</option>
-            @foreach (var product in _productList)
-            {
-                <option value="@product.Id">@product.Name</option>
-            }
-        </select>
-        <span>(@_productList[_selectedProductId - 1].UnitPrice.ToString("C") / @_productList[_selectedProductId - 1].SingularUnitName)</span>
-        <button title="Add item" @onclick="AddItem" class="btn" style="width: 15px; padding: 6px"><i class="fa fa-plus"></i></button>
+        <button @onclick="@(e => AddItem(productId: 1, quantity: 5))" style="width: 115px; height: 115px; font-size: 25px"><i class="@($"fa fa-{_productList[1 - 1].ImageClassName}")"></i><div>@_productList[1 - 1].Name</div><div>@((_productList[1 - 1].UnitPrice * 5).ToString("C"))</div></button>
+        <button @onclick="@(e => AddItem(productId: 1, quantity: 10))" style="width: 115px; height: 115px; font-size: 25px"><i class="@($"fa fa-{_productList[1 - 1].ImageClassName}")"></i><div>@_productList[1 - 1].Name</div><div>@((_productList[1 - 1].UnitPrice * 10).ToString("C"))</div></button>
+        <button @onclick="@(e => AddItem(productId: 2, quantity: 1))" style="width: 115px; height: 115px; font-size: 25px"><i class="@($"fa fa-{_productList[2 - 1].ImageClassName}")"></i><div>@_productList[2 - 1].Name</div><div>@_productList[2 - 1].UnitPrice.ToString("C")</div></button>
+        <button @onclick="@(e => AddItem(productId: 3, quantity: 1))" style="width: 115px; height: 115px; font-size: 25px"><i class="@($"fa fa-{_productList[3 - 1].ImageClassName}")"></i><div>@_productList[3 - 1].Name</div><div>@_productList[3 - 1].UnitPrice.ToString("C")</div></button>
+        <button @onclick="@(e => AddItem(productId: 4, quantity: 1))" style="width: 115px; height: 115px; font-size: 25px"><i class="@($"fa fa-{_productList[4 - 1].ImageClassName}")"></i><div>@_productList[4 - 1].Name</div><div>@_productList[4 - 1].UnitPrice.ToString("C")</div></button>
     </div>
+
+    <br/>
 
     <table class="sale-items">
         <tr class="border_bottom">
             <th><b>Item</b></th>
             <th><b>Qty</b></th>
-            <th />
+            <th/>
             <th><b>Each</b></th>
             <th><b>Total</b></th>
-            <th style="width: 30px" />
+            <th style="width: 30px"/>
         </tr>
         @{
             foreach (var saleItem in _sale.SaleItems)
             {
-            <tr @key=saleItem>
-                <td>@saleItem.Product.Name</td>
-                <td style="width: 80px; padding-right: 10px">
-                    <span style="text-align: right">@saleItem.Quantity</span>
-                    <button title="Add 1" @onclick="@(e => ChangeItemQuantity(@saleItem.Product.Id, @saleItem.Quantity + 1))" class="btn" style="width: 15px; padding: 6px"><i class="fa fa-plus"></i></button>
-                    <button title="Remove 1" @onclick="@(e => ChangeItemQuantity(@saleItem.Product.Id, @saleItem.Quantity - 1))" class="btn" style="width: 15px; padding: 6px"><i class="fa fa-minus"></i></button>
-                </td>
-                <td>@saleItem.Product.PluralUnitName</td>
-                <td style="text-align: right">@saleItem.Product.UnitPrice.ToString("C")</td>
-                <td style="text-align: right">@saleItem.TotalPrice.ToString("C")</td>
-                <td style="width: 63px; padding: 5px"><button title="Delete item" @onclick="@(e => DeleteItem(@saleItem.Product.Id))" class="btn" style="width: 30px"><i class="fa fa-trash"></i></button></td>
-            </tr>
+                <tr @key=saleItem>
+                    <td><i class="@($"fa fa-{saleItem.Product.ImageClassName}")"></i> @saleItem.Product.Name</td>
+                    <td style="width: 80px; padding-right: 10px">
+                        <span style="text-align: right">@saleItem.Quantity</span>
+                        <button title="Add 1" @onclick="@(e => ChangeItemQuantity(@saleItem.Product.Id, @saleItem.Quantity + 1))" class="btn" style="width: 15px; padding: 6px"><i class="fa fa-plus"></i></button>
+                        <button title="Remove 1" @onclick="@(e => ChangeItemQuantity(@saleItem.Product.Id, @saleItem.Quantity - 1))" class="btn" style="width: 15px; padding: 6px"><i class="fa fa-minus"></i></button>
+                    </td>
+                    <td>@saleItem.Product.PluralUnitName</td>
+                    <td style="text-align: right">@saleItem.Product.UnitPrice.ToString("C")</td>
+                    <td style="text-align: right">@saleItem.TotalPrice.ToString("C")</td>
+                    <td style="width: 63px; padding: 5px"><button title="Delete item" @onclick="@(e => DeleteItem(@saleItem.Product.Id))" class="btn" style="width: 30px"><i class="fa fa-trash"></i></button></td>
+                </tr>
             }
         }
     </table>
 
-    <br />
+    <br/>
 
     <div>
-        <div><input type="text" inputmode="numeric" @onchange="PaymentAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, _sale.Balance * -1).ToString("C"))" /><button @onclick="AddPayment" style="width: 120px">Add Payment</button></div>
-        <div><input type="text" inputmode="numeric" @onchange="ChangeAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, _sale.Balance).ToString("C"))" /><button @onclick="GiveChange" style="width: 120px">Give Change</button></div>
+        <div><input type="text" inputmode="numeric" @onchange="PaymentAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, _sale.Balance * -1).ToString("C"))"/><button @onclick="AddPayment" style="width: 120px">Add Payment</button></div>
+        <div><input type="text" inputmode="numeric" @onchange="ChangeAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, _sale.Balance).ToString("C"))"/><button @onclick="GiveChange" style="width: 120px">Give Change</button></div>
     </div>
 
-    <br />
+    <br/>
 
     <table>
         <tr><td><b>Items:</b></td><td style="text-align: right">@_sale.TotalItems.ToString()</td></tr>
