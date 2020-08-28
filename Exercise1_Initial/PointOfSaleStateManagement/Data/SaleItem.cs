@@ -4,9 +4,16 @@ namespace PointOfSaleStateManagement.Data
 {
     public class SaleItem
     {
-        public Sale Sale { get; set; }
+        public SaleItem(Sale sale, Product product, int quantity)
+        {
+            Sale = sale;
+            Product = product;
+            Quantity = quantity;
+        }
 
-        public Product Product { get; set; }
+        public Sale Sale { get; }
+
+        public Product Product { get; }
 
         private int _quantity;
         public int Quantity
@@ -18,7 +25,7 @@ namespace PointOfSaleStateManagement.Data
 
                 if (Product is null || Quantity == 0)
                 { TotalPrice = 0; }
-                else 
+                else
                 { TotalPrice = Quantity * Product.UnitPrice; }
 
                 Sale.UpdateSaleItem();

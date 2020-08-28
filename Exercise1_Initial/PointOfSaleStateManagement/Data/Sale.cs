@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PointOfSaleStateManagement.Data
@@ -11,52 +12,84 @@ namespace PointOfSaleStateManagement.Data
         public int Id { get; }
         public double AmountPaid { get; private set; }
         public double ChangeGiven { get; private set; }
+
+        public bool IsOpen => !IsOverpaid && !IsCancelled && !IsPaid;
+        public bool IsOverpaid => Balance > 0;
+        public bool IsCancelled { get; private set; }
+        public bool IsPaid => Math.Abs(Balance) < 0.001 && SaleItems.Count > 0 && !IsCancelled;
+
         public double SubTotal { get; set; }
 
-        public IReadOnlyList<SaleItem> SaleItems { get; set; }
+        public IList<SaleItem> SaleItems { get; } = new List<SaleItem>();
         public double Balance { get; private set; }
         public int TotalItems { get; private set; }
 
         public Sale(int id)
         {
             Id = id;
-            InitializeSaleItems();
         }
 
-        public void AddChange(Change change)
+        public ActionResult AddChange(Change change)
         {
             _change.Add(change);
             UpdateAmounts();
+
+            return new ActionResult(wasSuccess: true);
         }
 
-        public void AddPayment(Payment payment)
+        public ActionResult AddItem(SaleItem item)
+        {
+            var selectedItem = SaleItems.FirstOrDefault(i => i.Product.Id == item.Product.Id);
+            if (selectedItem != null)
+            { selectedItem.Quantity += item.Quantity; }
+            else
+            { SaleItems.Add(item); }
+
+            UpdateAmounts();
+
+            return new ActionResult(wasSuccess: true);
+        }
+
+        public ActionResult AddPayment(Payment payment)
         {
             _payments.Add(payment);
             UpdateAmounts();
+
+            return new ActionResult(wasSuccess: true);
         }
 
-        public void Cancel()
+        public ActionResult Cancel()
         {
-            //!!!
+            IsCancelled = true;
+
+            return new ActionResult(wasSuccess: true);
         }
 
-        public void UpdateSaleItem()
+        public ActionResult DeleteItem(int productId)
         {
-            if (SaleItems == null)
-            { return; }
-
+            SaleItems.Remove(SaleItems.FirstOrDefault(i => i.Product.Id == productId));
             UpdateAmounts();
+
+            return new ActionResult(wasSuccess: true);
         }
 
-        private void InitializeSaleItems()
+        public ActionResult SetItemQuantity(int productId, int newQuantity)
         {
-            SaleItems = new List<SaleItem>
-            {
-                new SaleItem { Sale = this, Quantity = 0, Product = new Product { Id = 1, Name = "Fuel", UnitName = "Gallons", UnitPrice = 2.00 } },
-                new SaleItem { Sale = this, Quantity = 0, Product = new Product { Id = 2, Name = "Oil", UnitName = "Cans", UnitPrice = 3.50 } },
-                new SaleItem { Sale = this, Quantity = 0, Product = new Product { Id = 3, Name = "Soda", UnitName = "Cans", UnitPrice = 1.00 } },
-                new SaleItem { Sale = this, Quantity = 0, Product = new Product { Id = 4, Name = "Chips", UnitName = "Bags", UnitPrice = 1.50 } }
-            };
+            var saleItem = SaleItems.FirstOrDefault(i => i.Product.Id == productId);
+            if (saleItem == null)
+            { return new ActionResult(wasSuccess: false, $"ProductId {productId} not found in sale items."); }
+
+            saleItem.Quantity = newQuantity;
+            UpdateAmounts();
+
+            return new ActionResult(wasSuccess: true);
+        }
+
+        public ActionResult UpdateSaleItem()
+        {
+            UpdateAmounts();
+
+            return new ActionResult(wasSuccess: true);
         }
 
         private void UpdateAmounts()

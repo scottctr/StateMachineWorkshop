@@ -2,9 +2,19 @@
 {
     public class Product
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string UnitName { get; set; }
-        public double UnitPrice { get; set; }
+        public Product(int id, string name, string singularUnitName, string pluralUnitName, double unitPrice)
+        {
+            Id = id;
+            Name = name;
+            SingularUnitName = singularUnitName;
+            PluralUnitName = pluralUnitName;
+            UnitPrice = unitPrice;
+        }
+
+        public int Id { get; }
+        public string Name { get; }
+        public string SingularUnitName { get; }
+        public string PluralUnitName { get; }
+        public double UnitPrice { get; }
     }
 }
