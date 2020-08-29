@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace PointOfSaleStateManagement.Data
@@ -12,11 +11,6 @@ namespace PointOfSaleStateManagement.Data
         public int Id { get; }
         public double AmountPaid { get; private set; }
         public double ChangeGiven { get; private set; }
-
-        public bool IsOpen => !IsOverpaid && !IsCancelled && !IsPaid;
-        public bool IsOverpaid => Balance > 0;
-        public bool IsCancelled { get; private set; }
-        public bool IsPaid => Math.Abs(Balance) < 0.001 && SaleItems.Count > 0 && !IsCancelled;
 
         public double SubTotal { get; set; }
 
@@ -60,9 +54,7 @@ namespace PointOfSaleStateManagement.Data
 
         public ActionResult Cancel()
         {
-            IsCancelled = true;
-
-            return new ActionResult(wasSuccess: true);
+            return new ActionResult(wasSuccess: false, "Not implemented");
         }
 
         public ActionResult DeleteItem(int productId)
@@ -72,6 +64,8 @@ namespace PointOfSaleStateManagement.Data
 
             return new ActionResult(wasSuccess: true);
         }
+
+        public bool IsComplete => false; //TODO Sale only complete when paid or cancelled
 
         public ActionResult SetItemQuantity(int productId, int newQuantity)
         {

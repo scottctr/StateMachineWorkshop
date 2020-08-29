@@ -1,8 +1,6 @@
 ﻿@page "/"
-@inject IJSRuntime JSRuntime;
 
 <div>
-    @*<img style="vertical-align: middle" src="https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-505x400.jpg" alt="Pop's Store and Gas Station - Final Image" width="189" height="150" srcset="https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-505x400.jpg 505w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-300x238.jpg 300w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h.jpg 884w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-32x25.jpg 32w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-50x40.jpg 50w" sizes="(max-width: 505px) 100vw, 505px" />*@
     <img style="vertical-align: middle" src="Images\gas-station-final-700h-505x400.jpg" alt="Pop's Store and Gas Station - Final Image" width="189" height="150" srcset="https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-505x400.jpg 505w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-300x238.jpg 300w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h.jpg 884w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-32x25.jpg 32w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-50x40.jpg 50w" sizes="(max-width: 505px) 100vw, 505px" />
     <span style="font-size: 66px; color: brown">Pop's Gas and Stuff</span>
 </div>
@@ -13,13 +11,13 @@
     <div class="row">
         <div class="column">
             <div>@DateTime.Now.ToShortDateString() @DateTime.Now.ToShortTimeString()</div>
-            <p><b>Order #:</b> @_sale.Id.ToString()</p>
+            <p><b>Order #:</b> @Sale.Id.ToString()</p>
         </div>
         <div class="column">
-            <div><i class="@(_sale.IsOpen ? "fa fa-check" : "fa fa-times")" style="@(_sale.IsOpen ? "color: green" : "")" /> Open</div>
-            <div><i class="@(_sale.IsOverpaid ? "fa fa-exclamation" : "fa fa-times")" style="@(_sale.IsOverpaid ? "color: yellow" : "")" /> Overpaid</div>
-            <div><i class="@(_sale.IsCancelled ? "fa fa-exclamation" : "fa fa-times")" style="@(_sale.IsCancelled ? "color: red" : "")" /> Cancelled</div>
-            <div><i class="@(_sale.IsPaid ? "fa fa-check" : "fa fa-times")" style="@(_sale.IsPaid ? "color: green" : "")" /> Paid</div>
+            @*<div><i class="@(_sale.IsOpen ? "fa fa-check" : "fa fa-times")" style="@(_sale.IsOpen ? "color: green" : "")"/> Open</div>
+            <div><i class="@(_sale.IsOverpaid ? "fa fa-exclamation" : "fa fa-times")" style="@(_sale.IsOverpaid ? "color: yellow" : "")"/> Overpaid</div>
+            <div><i class="@(_sale.IsCancelled ? "fa fa-exclamation" : "fa fa-times")" style="@(_sale.IsCancelled ? "color: red" : "")"/> Cancelled</div>
+            <div><i class="@(_sale.IsPaid ? "fa fa-check" : "fa fa-times")" style="@(_sale.IsPaid ? "color: green" : "")"/> Paid</div>*@
         </div>
     </div>
 </div>
@@ -47,7 +45,7 @@
             <th style="width: 30px"/>
         </tr>
         @{
-            foreach (var saleItem in _sale.SaleItems)
+            foreach (var saleItem in Sale.SaleItems)
             {
                 <tr @key=saleItem>
                     <td><i class="@($"fa fa-{saleItem.Product.ImageClassName}")"></i> @saleItem.Product.Name</td>
@@ -68,26 +66,27 @@
     <br/>
 
     <div>
-        <div><input type="text" inputmode="numeric" @onchange="PaymentAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, _sale.Balance * -1).ToString("C"))"/><button @onclick="AddPayment" style="width: 120px">Add Payment</button></div>
-        <div><input type="text" inputmode="numeric" @onchange="ChangeAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, _sale.Balance).ToString("C"))"/><button @onclick="GiveChange" style="width: 120px">Give Change</button></div>
+        <div><input type="text" inputmode="numeric" @onchange="PaymentAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, Sale.Balance * -1).ToString("C"))"/><button @onclick="AddPayment" style="width: 120px">Add Payment</button></div>
+        <div><input type="text" inputmode="numeric" @onchange="ChangeAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, Sale.Balance).ToString("C"))"/><button @onclick="GiveChange" style="width: 120px">Give Change</button></div>
     </div>
 
     <br/>
 
     <table>
-        <tr><td><b>Items:</b></td><td style="text-align: right">@_sale.TotalItems.ToString()</td></tr>
-        <tr><td><b>Sub-Total:</b></td><td style="text-align: right">@_sale.SubTotal.ToString("C")</td></tr>
-        <tr><td><b>Payments:</b></td><td style="text-align: right">@_sale.AmountPaid.ToString("C")</td></tr>
-        <tr><td><b>Change:</b></td><td style="text-align: right">@_sale.ChangeGiven.ToString("C")</td></tr>
-        <tr style="text-align: right; text-decoration: underline"><td></td><td></td><td><b>Balance:</b></td><td style="text-align: right"><i>@_sale.Balance.ToString("C")</i></td></tr>
+        <tr><td><b>Items:</b></td><td style="text-align: right">@Sale.TotalItems.ToString()</td></tr>
+        <tr><td><b>Sub-Total:</b></td><td style="text-align: right">@Sale.SubTotal.ToString("C")</td></tr>
+        <tr><td><b>Payments:</b></td><td style="text-align: right">@Sale.AmountPaid.ToString("C")</td></tr>
+        <tr><td><b>Change:</b></td><td style="text-align: right">@Sale.ChangeGiven.ToString("C")</td></tr>
+        <tr style="text-align: right; text-decoration: underline"><td></td><td></td><td><b>Balance:</b></td><td style="text-align: right"><i>@Sale.Balance.ToString("C")</i></td></tr>
     </table>
 </div>
 
 <br />
 
 <div class="order-actions" style="display: flex; align-items: center; text-align: center; justify-content: center">
-    <button style="width: 120px; margin: 15px" @onclick="Cancel">Cancel</button>
-    <button style="width: 120px; margin: 15px" @onclick="CreateNewSale">New Sale</button>
+    @if(IncludeCancel) {<button style="width: 120px; margin: 15px" @onclick="Cancel">Cancel</button>}
+  
+    <button style="width: 120px; margin: 15px" @onclick="@(e => StartNewSale())">New Sale</button>
 </div>
 
 <hr />
