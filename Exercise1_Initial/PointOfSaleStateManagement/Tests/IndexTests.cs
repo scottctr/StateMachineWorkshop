@@ -20,7 +20,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.StartNewSale();
 
-            Assert.False(result.WasSuccess, "Started a new sale when current sale was open");
+            Assert.False(result.IsSuccess, "Started a new sale when current sale was open");
         }
 
         [Fact]
@@ -32,7 +32,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.StartNewSale();
 
-            Assert.False(result.WasSuccess, "Started a new sale when current sale was overpaid");
+            Assert.False(result.IsSuccess, "Started a new sale when current sale was overpaid");
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.StartNewSale();
 
-            Assert.True(result.WasSuccess, "Unable to start a new sale when current sale paid");
+            Assert.True(result.IsSuccess, "Unable to start a new sale when current sale paid");
         }
 
         [Fact]
@@ -60,7 +60,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.StartNewSale();
 
-            Assert.True(result.WasSuccess, "Was unable to start a new sale when current sale cancelled");
+            Assert.True(result.IsSuccess, "Was unable to start a new sale when current sale cancelled");
         }
     }
 }

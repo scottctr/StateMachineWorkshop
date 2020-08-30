@@ -7,7 +7,7 @@ namespace PointOfSaleStateManagement.Pages
 {
     public partial class Index
     {
-        private const bool IncludeCancel = false;
+        private const bool IncludeCancel = true;
 
         private double _changeAmount;
         private double _paymentAmount;
@@ -28,10 +28,10 @@ namespace PointOfSaleStateManagement.Pages
             var newSaleItem = new SaleItem(Sale, _productList[productId - 1], quantity);
 
             var result = Sale.AddItem(newSaleItem);
-            if (result.WasSuccess)
+            if (result.IsSuccess)
             {
+                AddLogEntry($"Added {newSaleItem.Quantity} {newSaleItem.Product.GetUnitName(newSaleItem.Quantity)} of {newSaleItem.Product.Name}");
                 SetDefaultAmounts();
-                AddLogEntry($"Added a {newSaleItem.Product.SingularUnitName} of {newSaleItem.Product.Name}");
             }
             else
             { LogActionError("Add item", result); }
@@ -45,10 +45,10 @@ namespace PointOfSaleStateManagement.Pages
         internal void AddPayment(double paymentAmount)
         {
             var result = Sale.AddPayment(new Payment(paymentAmount));
-            if (result.WasSuccess)
+            if (result.IsSuccess)
             {
-                SetDefaultChangeAmount();
                 AddLogEntry($"Payment: {_paymentAmount:C}");
+                SetDefaultChangeAmount();
             }
             else
             { LogActionError("Add payment", result); }
@@ -57,7 +57,7 @@ namespace PointOfSaleStateManagement.Pages
         private void Cancel()
         {
             var result = Sale.Cancel();
-            if (result.WasSuccess)
+            if (result.IsSuccess)
             { AddLogEntry("Sale cancelled"); }
             else
             { LogActionError("Cancel sale", result); }
@@ -66,10 +66,10 @@ namespace PointOfSaleStateManagement.Pages
         private void ChangeItemQuantity(in int productId, int newQuantity)
         {
             var result = Sale.SetItemQuantity(productId, newQuantity);
-            if (result.WasSuccess)
+            if (result.IsSuccess)
             {
-                SetDefaultAmounts();
                 AddLogEntry($"{_productList[productId-1].Name} quantity changed to {newQuantity}");
+                SetDefaultAmounts();
             }
             else
             { LogActionError("Change item quantity", result); }
@@ -78,22 +78,37 @@ namespace PointOfSaleStateManagement.Pages
         private void DeleteItem(int productId)
         {
             var result = Sale.DeleteItem(productId);
-            if (result.WasSuccess)
+            if (result.IsSuccess)
             {
-                SetDefaultAmounts();
                 AddLogEntry($"Deleted {_productList[productId - 1].Name}");
+                SetDefaultAmounts();
             }
             else
             { LogActionError("Delete item", result); }
         }
 
+        private string GetSaleState()
+        {
+            if (Sale.IsOpen)
+            { return "Open"; }
+
+            if (Sale.IsCancelled)
+            { return "Cancelled"; }
+
+            if (Sale.IsPaid)
+            { return "Paid"; }
+
+            //if (Sale.IsOverpaid)
+            return "Overpaid";
+        }
+
         private void GiveChange()
         {
             var result = Sale.AddChange(new Change(_changeAmount));
-            if (result.WasSuccess)
+            if (result.IsSuccess)
             {
-                SetDefaultAmounts();
                 AddLogEntry($"Change given: {_changeAmount:C}");
+                SetDefaultAmounts();
             }
             else
             { LogActionError("Give change", result); }
@@ -102,8 +117,12 @@ namespace PointOfSaleStateManagement.Pages
         private void AddLogEntry(string entry, bool skipBalance = false)
         {
             _log.Add(new LogEntry(entry));
-            if (!skipBalance)
-            { _log.Add(new LogEntry($"   -> New balance: { Sale.Balance:C}")); }
+            
+            if (skipBalance)
+            { return; }
+
+            _log.Add(new LogEntry($"   -> New balance: { Sale.Balance:C}"));
+            _log.Add(new LogEntry($"   -> State: { GetSaleState() }"));
         }
 
         private void ChangeAmountChanged(ChangeEventArgs args)
@@ -122,7 +141,7 @@ namespace PointOfSaleStateManagement.Pages
 
         private void LogActionError(string action, ActionResult result)
         {
-            if (!result.WasSuccess)
+            if (!result.IsSuccess)
             { AddLogEntry($"{action} failed - {result.ErrorMessage}", skipBalance: true); }
         }
 
@@ -150,16 +169,14 @@ namespace PointOfSaleStateManagement.Pages
 
         internal ActionResult StartNewSale()
         {
-            if (Sale is null || Sale.IsComplete)
-            {
-                Sale = new Sale(++_saleId);
-                SetDefaultAmounts();
-                AddLogEntry("Started new sale", skipBalance: true);
+            if (Sale != null && !Sale.IsComplete)
+            { return new ActionResult(isSuccess: false, "Current sale must be Paid or Cancelled before starting new sale"); }
 
-                return new ActionResult(wasSuccess: true);
-            }
+            Sale = new Sale(++_saleId);
+            SetDefaultAmounts();
+            AddLogEntry($"Started new sale {_saleId}");
 
-            return new ActionResult(wasSuccess: false, "Current sale must be Paid or Cancelled before starting new sale");
+            return new ActionResult(isSuccess: true);
         }
     }
 }

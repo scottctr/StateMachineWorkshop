@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PointOfSaleStateManagement.Data
@@ -18,6 +19,12 @@ namespace PointOfSaleStateManagement.Data
         public double Balance { get; private set; }
         public int TotalItems { get; private set; }
 
+        public bool IsCancelled { get; private set; }
+        public bool IsPaid => Math.Abs(Balance) < .001 && _payments.Any() && SaleItems.Any(i => i.Quantity > 0);
+        public bool IsOverpaid => Balance > 0 && !IsCancelled;
+        public bool IsOpen => !IsCancelled && !IsPaid && !IsOverpaid;
+        public bool IsComplete => IsPaid || IsCancelled;
+
         public Sale(int id)
         {
             Id = id;
@@ -25,65 +32,89 @@ namespace PointOfSaleStateManagement.Data
 
         public ActionResult AddChange(Change change)
         {
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot give change on paid or cancelled sale"); }
+
             _change.Add(change);
             UpdateAmounts();
-
-            return new ActionResult(wasSuccess: true);
+            return new ActionResult(isSuccess: true);
         }
 
-        public ActionResult AddItem(SaleItem item)
+        public ActionResult AddItem(SaleItem newItem)
         {
-            var selectedItem = SaleItems.FirstOrDefault(i => i.Product.Id == item.Product.Id);
-            if (selectedItem != null)
-            { selectedItem.Quantity += item.Quantity; }
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot add items to paid or cancelled sales"); }
+
+            var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == newItem.Product.Id);
+
+            if (existingItem != null)
+            {
+                newItem = new SaleItem(this, newItem.Product, newItem.Quantity + existingItem.Quantity);
+                ReplaceItem(existingItem, newItem);
+            }
             else
-            { SaleItems.Add(item); }
+            { SaleItems.Add(newItem); }
 
             UpdateAmounts();
 
-            return new ActionResult(wasSuccess: true);
+            return new ActionResult(isSuccess: true);
         }
 
         public ActionResult AddPayment(Payment payment)
         {
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot add payment to cancelled or paid sales"); }
+
+            if (Balance >= 0)
+            { return new ActionResult(isSuccess: false, "Cannot add payment to sale with balance equal or greater than 0"); }
+
             _payments.Add(payment);
             UpdateAmounts();
+            return new ActionResult(isSuccess: true);
 
-            return new ActionResult(wasSuccess: true);
         }
 
         public ActionResult Cancel()
         {
-            return new ActionResult(wasSuccess: false, "Not implemented");
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot cancel paid or cancelled sales"); }
+
+            if (_payments.Sum(p => p.Amount) > _change.Sum(c => c.Amount))
+            { return new ActionResult(isSuccess: false, "Cannot cancel sale until payments returned"); }
+
+            IsCancelled = true;
+            return new ActionResult(isSuccess: true);
         }
 
         public ActionResult DeleteItem(int productId)
         {
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot delete items from paid or cancelled sales"); }
+
             SaleItems.Remove(SaleItems.FirstOrDefault(i => i.Product.Id == productId));
             UpdateAmounts();
 
-            return new ActionResult(wasSuccess: true);
+            return new ActionResult(isSuccess: true);
         }
-
-        public bool IsComplete => false; //TODO Sale only complete when paid or cancelled
 
         public ActionResult SetItemQuantity(int productId, int newQuantity)
         {
-            var saleItem = SaleItems.FirstOrDefault(i => i.Product.Id == productId);
-            if (saleItem == null)
-            { return new ActionResult(wasSuccess: false, $"ProductId {productId} not found in sale items."); }
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot change item quantity on paid or cancelled sales"); }
 
-            saleItem.Quantity = newQuantity;
+            var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == productId);
+            if (existingItem is null)
+            { return new ActionResult(isSuccess: false, $"ProductId {productId} not found in sale items."); }
+
+            ReplaceItem(existingItem, new SaleItem(this, existingItem.Product, newQuantity));
             UpdateAmounts();
 
-            return new ActionResult(wasSuccess: true);
+            return new ActionResult(isSuccess: true);
         }
 
-        public ActionResult UpdateSaleItem()
+        private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
         {
-            UpdateAmounts();
-
-            return new ActionResult(wasSuccess: true);
+            SaleItems[SaleItems.IndexOf(existingItem)] = newItem;
         }
 
         private void UpdateAmounts()

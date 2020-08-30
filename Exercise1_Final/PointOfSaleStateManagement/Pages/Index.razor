@@ -14,10 +14,10 @@
             <p><b>Order #:</b> @Sale.Id.ToString()</p>
         </div>
         <div class="column">
-            @*<div><i class="@(_sale.IsOpen ? "fa fa-check" : "fa fa-times")" style="@(_sale.IsOpen ? "color: green" : "")"/> Open</div>
-            <div><i class="@(_sale.IsOverpaid ? "fa fa-exclamation" : "fa fa-times")" style="@(_sale.IsOverpaid ? "color: yellow" : "")"/> Overpaid</div>
-            <div><i class="@(_sale.IsCancelled ? "fa fa-exclamation" : "fa fa-times")" style="@(_sale.IsCancelled ? "color: red" : "")"/> Cancelled</div>
-            <div><i class="@(_sale.IsPaid ? "fa fa-check" : "fa fa-times")" style="@(_sale.IsPaid ? "color: green" : "")"/> Paid</div>*@
+            <div><i class="@(Sale.IsOpen ? "fa fa-check" : "fa fa-times")" style="@(Sale.IsOpen ? "color: green" : "")"/> Open</div>
+            <div><i class="@(Sale.IsOverpaid ? "fa fa-exclamation" : "fa fa-times")" style="@(Sale.IsOverpaid ? "color: yellow" : "")"/> Overpaid</div>
+            <div><i class="@(Sale.IsCancelled ? "fa fa-exclamation" : "fa fa-times")" style="@(Sale.IsCancelled ? "color: red" : "")"/> Cancelled</div>
+            <div><i class="@(Sale.IsPaid ? "fa fa-check" : "fa fa-times")" style="@(Sale.IsPaid ? "color: green" : "")"/> Paid</div>
         </div>
     </div>
 </div>

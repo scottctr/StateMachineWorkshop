@@ -1,0 +1,25 @@
+﻿********************************
+* Existing Rules - Don't break *
+********************************
+1. Modify items
+   a. Add
+   b. change quantity
+   c. delete
+2. Accept payment
+3. Give change
+4. Start a new sale
+
+*************
+* New Rules *
+*************
+5. Can only accept payment if balance < 0
+6. Skip - replaced by 8a
+7. No changes to paid sales
+   - Paid = 0 balance, 1+ items, 1+ payments
+8. Need to be able to cancel a sale
+   a. If payments on sale, must give change for total payment amounts before cancelling
+      - This negates rule 2: “Can only give change when balance > 0”
+   b. No changes to cancelled sales
+      - Can’t modify items, add payments, give change, or cancel
+9. Can’t create a new sale until current sale is paid or cancelled
+- Implementation note: Set Index.cs/IncludeCancel = true

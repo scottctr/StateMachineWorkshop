@@ -28,20 +28,25 @@ namespace PointOfSaleStateManagement.Data
             _change.Add(change);
             UpdateAmounts();
 
-            return new ActionResult(wasSuccess: true);
+            return new ActionResult(isSuccess: true);
         }
 
-        public ActionResult AddItem(SaleItem item)
+
+        public ActionResult AddItem(SaleItem newItem)
         {
-            var selectedItem = SaleItems.FirstOrDefault(i => i.Product.Id == item.Product.Id);
-            if (selectedItem != null)
-            { selectedItem.Quantity += item.Quantity; }
+            var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == newItem.Product.Id);
+
+            if (existingItem != null)
+            {
+                newItem = new SaleItem(this, newItem.Product, newItem.Quantity + existingItem.Quantity);
+                ReplaceItem(existingItem, newItem);
+            }
             else
-            { SaleItems.Add(item); }
+            { SaleItems.Add(newItem); }
 
             UpdateAmounts();
 
-            return new ActionResult(wasSuccess: true);
+            return new ActionResult(isSuccess: true);
         }
 
         public ActionResult AddPayment(Payment payment)
@@ -49,12 +54,12 @@ namespace PointOfSaleStateManagement.Data
             _payments.Add(payment);
             UpdateAmounts();
 
-            return new ActionResult(wasSuccess: true);
+            return new ActionResult(isSuccess: true);
         }
 
         public ActionResult Cancel()
         {
-            return new ActionResult(wasSuccess: false, "Not implemented");
+            return new ActionResult(isSuccess: false, "Not implemented");
         }
 
         public ActionResult DeleteItem(int productId)
@@ -62,28 +67,27 @@ namespace PointOfSaleStateManagement.Data
             SaleItems.Remove(SaleItems.FirstOrDefault(i => i.Product.Id == productId));
             UpdateAmounts();
 
-            return new ActionResult(wasSuccess: true);
+            return new ActionResult(isSuccess: true);
         }
 
-        public bool IsComplete => false; //TODO Sale only complete when paid or cancelled
+        public bool IsComplete => true; //TODO Sale only complete when paid or cancelled
 
         public ActionResult SetItemQuantity(int productId, int newQuantity)
         {
-            var saleItem = SaleItems.FirstOrDefault(i => i.Product.Id == productId);
-            if (saleItem == null)
-            { return new ActionResult(wasSuccess: false, $"ProductId {productId} not found in sale items."); }
+            var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == productId);
 
-            saleItem.Quantity = newQuantity;
+            if (existingItem is null)
+            { return new ActionResult(isSuccess: false, $"ProductId {productId} not found in sale items."); }
+
+            ReplaceItem(existingItem, new SaleItem(this, existingItem.Product, newQuantity));
             UpdateAmounts();
 
-            return new ActionResult(wasSuccess: true);
+            return new ActionResult(isSuccess: true);
         }
 
-        public ActionResult UpdateSaleItem()
+        private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
         {
-            UpdateAmounts();
-
-            return new ActionResult(wasSuccess: true);
+            SaleItems[SaleItems.IndexOf(existingItem)] = newItem;
         }
 
         private void UpdateAmounts()

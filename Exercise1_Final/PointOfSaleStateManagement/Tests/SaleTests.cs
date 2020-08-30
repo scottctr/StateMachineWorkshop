@@ -16,8 +16,8 @@ namespace PointOfSaleStateManagement.Tests
             var result1 = sut.AddItem(item1);
             var result2 = sut.AddItem(item2);
 
-            Assert.True(result1.WasSuccess, "Unable to add item to sale");
-            Assert.True(result2.WasSuccess, "Unable to add 2nd item to sale");
+            Assert.True(result1.IsSuccess, "Unable to add item to sale");
+            Assert.True(result2.IsSuccess, "Unable to add 2nd item to sale");
             Assert.Equal(2, sut.SaleItems.Count);
             Assert.Equal(item1, sut.SaleItems.First());
             Assert.Equal(item2, sut.SaleItems.Last());
@@ -35,7 +35,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.AddItem(item1);
 
-            Assert.True(result.WasSuccess, "Was not able to add items to over paid sale");
+            Assert.True(result.IsSuccess, "Was not able to add items to over paid sale");
             Assert.Equal(4, sut.TotalItems);
         }
 
@@ -48,9 +48,9 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.SetItemQuantity(item1.Product.Id, 2);
 
-            Assert.True(result.WasSuccess, "Unable to change item quantity");
+            Assert.True(result.IsSuccess, "Unable to change item quantity");
             Assert.Equal(2, sut.SaleItems.First().Quantity);
-            Assert.Equal(item1, sut.SaleItems.First());
+            Assert.Equal(1, sut.SaleItems.Count);
         }
 
         [Fact]
@@ -62,7 +62,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.DeleteItem(item1.Product.Id);
 
-            Assert.True(result.WasSuccess, "Unable to delete item");
+            Assert.True(result.IsSuccess, "Unable to delete item");
             Assert.False(sut.SaleItems.Any());
         }
 
@@ -75,7 +75,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.AddPayment(new Payment(1.11));
 
-            Assert.True(result.WasSuccess, "Unable to pay");
+            Assert.True(result.IsSuccess, "Unable to pay");
             Assert.Equal(0, sut.Balance);
         }
 
@@ -89,47 +89,41 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.AddChange(new Change(9.00));
 
-            Assert.True(result.WasSuccess, "Unable to give change");
+            Assert.True(result.IsSuccess, "Unable to give change");
             Assert.Equal(0, sut.Balance);
         }
 
         [Fact]
         public void Test_5_cannot_add_payment_when_balance_0()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
             sut.AddPayment(new Payment(item1.TotalPrice));
 
-            var result = sut.AddPayment(new Payment(10));
+            var result = sut.AddPayment(new Payment(1));
 
-            Assert.False(result.WasSuccess, "Was able to add payment on paid sale");
+            Assert.False(result.IsSuccess, "Was able to add payment on paid sale");
             Assert.Equal(0, sut.Balance);
         }
 
         [Fact]
         public void Test_5_cannot_add_payment_when_balance_greater_than_0()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
             sut.AddPayment(new Payment(10));
 
-            var result = sut.AddPayment(new Payment(1));
+            var result = sut.AddPayment(new Payment(999));
 
-            Assert.False(result.WasSuccess, "Was able to add payment to overpaid sale");
-            Assert.Equal(0, sut.Balance);
+            Assert.False(result.IsSuccess, "Was able to add payment to overpaid sale");
+            Assert.Equal(9, sut.Balance);
         }
 
         [Fact]
         public void Test_6_cannot_give_change_when_balance_0()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -137,7 +131,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.AddChange(new Change(9.00));
 
-            Assert.False(result.WasSuccess, "Was able to give change on a paid sale");
+            Assert.False(result.IsSuccess, "Was able to give change on a paid sale");
             Assert.Equal(0, sut.Balance);
         }
 
@@ -150,8 +144,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_7_cannot_add_item_to_paid_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -159,7 +151,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.AddItem(new SaleItem(sut, new Product(2, "product2", "product2", "product2s", 2.00, imageClassName: "test2"), 2));
 
-            Assert.False(result.WasSuccess, "Was able to add item to paid sale");
+            Assert.False(result.IsSuccess, "Was able to add item to paid sale");
             Assert.Equal(0, sut.Balance);
             Assert.Equal(1, sut.SaleItems.Count);
             Assert.Equal(1, sut.TotalItems);
@@ -168,8 +160,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_7_cannot_change_item_quantity_on_paid_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -177,7 +167,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.SetItemQuantity(item1.Product.Id, 999);
 
-            Assert.False(result.WasSuccess, "Was able to change item quantity on paid sale");
+            Assert.False(result.IsSuccess, "Was able to change item quantity on paid sale");
             Assert.Equal(0, sut.Balance);
             Assert.Equal(1, sut.SaleItems.Count);
             Assert.Equal(1, sut.TotalItems);
@@ -186,8 +176,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_7_cannot_delete_item_to_paid_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -195,7 +183,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.DeleteItem(item1.Product.Id);
 
-            Assert.False(result.WasSuccess, "Was able to delete item on paid sale");
+            Assert.False(result.IsSuccess, "Was able to delete item on paid sale");
             Assert.Equal(0, sut.Balance);
             Assert.Equal(1, sut.SaleItems.Count);
             Assert.Equal(1, sut.TotalItems);
@@ -204,8 +192,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_7_cannot_pay_on_paid_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -213,7 +199,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.AddPayment(new Payment(item1.TotalPrice));
 
-            Assert.False(result.WasSuccess, "Was able to pay on paid sale");
+            Assert.False(result.IsSuccess, "Was able to pay on paid sale");
             Assert.Equal(0, sut.Balance);
             Assert.Equal(item1.TotalPrice, sut.AmountPaid);
         }
@@ -221,8 +207,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_7_cannot_give_change_on_paid_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -230,7 +214,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.AddChange(new Change(5.55));
 
-            Assert.False(result.WasSuccess, "Was able to give change on paid sale");
+            Assert.False(result.IsSuccess, "Was able to give change on paid sale");
             Assert.Equal(0, sut.Balance);
             Assert.Equal(0, sut.ChangeGiven);
         }
@@ -238,8 +222,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_8_can_cancel()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             var item2 = new SaleItem(sut, new Product(2, "product2", "product2", "product2s", 2.22, imageClassName: "test"), 2);
@@ -248,8 +230,8 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.Cancel();
 
-            Assert.True(result.WasSuccess, "Was unable to cancel open sale");
-            Assert.True(false /*TODO isCancelled*/, "Successfully cancelled sale not marked cancelled");
+            Assert.True(result.IsSuccess, "Was unable to cancel open sale");
+            Assert.True(sut.IsCancelled, "Successfully cancelled sale not marked cancelled");
         }
 
         [Fact]
@@ -262,15 +244,13 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.Cancel();
 
-            Assert.False(result.WasSuccess, "Cancelled sale with a payment balance");
-            Assert.True(false /*TODO isCancelled*/, "Successfully cancelled sale not marked cancelled");
+            Assert.False(result.IsSuccess, "Cancelled sale with a payment balance");
+            Assert.False(sut.IsCancelled, "Successfully cancelled sale not marked cancelled");
         }
 
         [Fact]
         public void Test_8b_cannot_add_items_on_cancelled_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -278,15 +258,13 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.AddItem(new SaleItem(sut, new Product(2, "product2", "product2", "product2s", 2.22, "test2"), 2));
 
-            Assert.False(result.WasSuccess, "Added items to cancelled sale");
+            Assert.False(result.IsSuccess, "Added items to cancelled sale");
             Assert.Equal(1, sut.TotalItems);
         }
 
         [Fact]
         public void Test_8b_cannot_change_item_quantity_on_cancelled_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -294,15 +272,13 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.SetItemQuantity(item1.Product.Id, 123);
 
-            Assert.False(result.WasSuccess, "Changed item quantity on cancelled sale");
+            Assert.False(result.IsSuccess, "Changed item quantity on cancelled sale");
             Assert.Equal(1, sut.TotalItems);
         }
 
         [Fact]
         public void Test_8b_cannot_delete_item_on_cancelled_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -310,15 +286,13 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.DeleteItem(item1.Product.Id);
 
-            Assert.False(result.WasSuccess, "Deleted item on cancelled sale");
+            Assert.False(result.IsSuccess, "Deleted item on cancelled sale");
             Assert.Equal(1, sut.TotalItems);
         }
 
         [Fact]
         public void Test_8b_cannot_pay_on_cancelled_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -326,15 +300,13 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.AddPayment(new Payment(10));
 
-            Assert.False(result.WasSuccess, "Added payment to cancelled sale");
+            Assert.False(result.IsSuccess, "Added payment to cancelled sale");
             Assert.Equal(0, sut.AmountPaid);
         }
 
         [Fact]
         public void Test_8b_cannot_give_change_to_cancelled_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(sut, new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -342,7 +314,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.AddChange(new Change(1.00));
 
-            Assert.False(result.WasSuccess, "Gave change on cancelled sale");
+            Assert.False(result.IsSuccess, "Gave change on cancelled sale");
             Assert.Equal(0, sut.ChangeGiven);
         }
 
@@ -356,7 +328,7 @@ namespace PointOfSaleStateManagement.Tests
 
             var result = sut.Cancel();
 
-            Assert.False(result.WasSuccess, "Cancelled a previously cancelled sale");
+            Assert.False(result.IsSuccess, "Cancelled a previously cancelled sale");
         }
     }
 }

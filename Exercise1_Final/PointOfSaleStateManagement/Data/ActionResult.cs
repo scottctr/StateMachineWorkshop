@@ -2,13 +2,13 @@
 {
     public class ActionResult
     {
-        public ActionResult(bool wasSuccess, string errorMessage = null)
+        public ActionResult(bool isSuccess, string errorMessage = null)
         {
-            WasSuccess = wasSuccess;
+            IsSuccess = isSuccess;
             ErrorMessage = errorMessage;
         }
 
-        public bool WasSuccess { get; }
+        public bool IsSuccess { get; }
         public string ErrorMessage { get; }
     }
 }

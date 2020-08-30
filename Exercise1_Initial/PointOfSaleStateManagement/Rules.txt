@@ -1,0 +1,21 @@
+﻿********************************
+* Existing Rules - Don't break *
+********************************
+1. Modify items
+   a. Add
+   b. change quantity
+   c. delete
+2. Accept payment
+3. Give change
+4. Start a new sale
+
+*************
+* New Rules *
+*************
+5. Can only accept payment if balance < 0
+6. Can only give change when balance > 0
+7. No changes to paid sales
+   - Paid = 0 balance, 1+ items, 1+ payments
+
+
+*** Include implementation details: may make "includeCancel" in final version of rules

@@ -1,7 +1,6 @@
-﻿using System;
-
-namespace PointOfSaleStateManagement.Data
+﻿namespace PointOfSaleStateManagement.Data
 {
+    //SaleItem is immutable to ensure all changes go through Sale so that we consolidate business rules there
     public class SaleItem
     {
         public SaleItem(Sale sale, Product product, int quantity)
@@ -9,29 +8,15 @@ namespace PointOfSaleStateManagement.Data
             Sale = sale;
             Product = product;
             Quantity = quantity;
+            TotalPrice = quantity * product.UnitPrice;
         }
 
         public Sale Sale { get; }
 
         public Product Product { get; }
 
-        private int _quantity;
-        public int Quantity
-        {
-            get => _quantity;
-            set
-            {
-                _quantity = Math.Max(0, value);
+        public int Quantity { get; }
 
-                if (Product is null || Quantity == 0)
-                { TotalPrice = 0; }
-                else
-                { TotalPrice = Quantity * Product.UnitPrice; }
-
-                Sale.UpdateSaleItem();
-            }
-        }
-
-        public double TotalPrice { get; set; }
+        public double TotalPrice { get; }
     }
 }

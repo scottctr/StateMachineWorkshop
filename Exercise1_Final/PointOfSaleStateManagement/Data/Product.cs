@@ -18,5 +18,10 @@
         public string PluralUnitName { get; }
         public double UnitPrice { get; }
         public string ImageClassName { get; }
+
+        public string GetUnitName(int quantity)
+        {
+            return quantity == 1 ? SingularUnitName : PluralUnitName;
+        }
     }
 }
