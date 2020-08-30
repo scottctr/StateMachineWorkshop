@@ -121,7 +121,7 @@ namespace PointOfSaleStateManagement.Pages
             if (skipBalance)
             { return; }
 
-            _log.Add(new LogEntry($"   -> New balance: { Sale.Balance:C}"));
+            _log.Add(new LogEntry($"   -> Balance: { Sale.Balance:C}"));
             _log.Add(new LogEntry($"   -> State: { GetSaleState() }"));
         }
 
@@ -172,9 +172,12 @@ namespace PointOfSaleStateManagement.Pages
             if (Sale != null && !Sale.IsComplete)
             { return new ActionResult(isSuccess: false, "Current sale must be Paid or Cancelled before starting new sale"); }
 
+            if (_saleId > 0)
+            { AddLogEntry($"<<< Sale {_saleId} Completed >>>", skipBalance: true); }
+
             Sale = new Sale(++_saleId);
             SetDefaultAmounts();
-            AddLogEntry($"Started new sale {_saleId}");
+            AddLogEntry($">>> Started new sale {_saleId} <<<");
 
             return new ActionResult(isSuccess: true);
         }

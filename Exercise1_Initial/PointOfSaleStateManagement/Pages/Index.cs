@@ -7,7 +7,7 @@ namespace PointOfSaleStateManagement.Pages
 {
     public partial class Index
     {
-        private const bool IncludeCancel = false;
+        private const bool IncludeCancel = false; //TODO set to true for final solution to see cancel button
 
         private double _changeAmount;
         private double _paymentAmount;
@@ -103,7 +103,7 @@ namespace PointOfSaleStateManagement.Pages
         {
             _log.Add(new LogEntry(entry));
             if (!skipBalance)
-            { _log.Add(new LogEntry($"   -> New balance: { Sale.Balance:C}")); }
+            { _log.Add(new LogEntry($"   -> Balance: { Sale.Balance:C}")); }
         }
 
         private void ChangeAmountChanged(ChangeEventArgs args)
@@ -153,9 +153,12 @@ namespace PointOfSaleStateManagement.Pages
             if (Sale != null && !Sale.IsComplete)
             { return new ActionResult(isSuccess: false, "Current sale must be Paid or Cancelled before starting new sale"); }
 
+            if (_saleId > 0)
+            { AddLogEntry($"<<< Sale {_saleId} Completed >>>", skipBalance: true); }
+
             Sale = new Sale(++_saleId);
             SetDefaultAmounts();
-            AddLogEntry($"Started new sale {_saleId}");
+            AddLogEntry($">>> Started new sale {_saleId} <<<");
 
             return new ActionResult(isSuccess: true);
         }

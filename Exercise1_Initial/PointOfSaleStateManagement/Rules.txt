@@ -18,4 +18,10 @@
    - Paid = 0 balance, 1+ items, 1+ payments
 
 
-*** Include implementation details: may make "includeCancel" in final version of rules
+************************
+* Implementation Notes *
+************************
+- Implement your changes in Data\Sales.cs (or possibly new classes used by the Sales class)
+  -- i.e. don't worry about adding the constraints to the UI for today's exercises
+- When rules are violated return an ActionResult with IsSuccess = false and a meaningful error message
+  -- Otherwise just return an ActionResult with IsSuccess = true
