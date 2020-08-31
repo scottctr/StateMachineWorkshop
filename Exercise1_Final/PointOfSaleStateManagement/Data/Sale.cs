@@ -49,7 +49,7 @@ namespace PointOfSaleStateManagement.Data
 
             if (existingItem != null)
             {
-                newItem = new SaleItem(this, newItem.Product, newItem.Quantity + existingItem.Quantity);
+                newItem = new SaleItem(newItem.Product, newItem.Quantity + existingItem.Quantity);
                 ReplaceItem(existingItem, newItem);
             }
             else
@@ -71,7 +71,6 @@ namespace PointOfSaleStateManagement.Data
             _payments.Add(payment);
             UpdateAmounts();
             return new ActionResult(isSuccess: true);
-
         }
 
         public ActionResult Cancel()
@@ -106,7 +105,7 @@ namespace PointOfSaleStateManagement.Data
             if (existingItem is null)
             { return new ActionResult(isSuccess: false, $"ProductId {productId} not found in sale items."); }
 
-            ReplaceItem(existingItem, new SaleItem(this, existingItem.Product, newQuantity));
+            ReplaceItem(existingItem, new SaleItem(existingItem.Product, newQuantity));
             UpdateAmounts();
 
             return new ActionResult(isSuccess: true);

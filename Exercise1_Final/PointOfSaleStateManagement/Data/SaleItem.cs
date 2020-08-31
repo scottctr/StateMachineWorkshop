@@ -2,15 +2,12 @@
 {
     public class SaleItem
     {
-        public SaleItem(Sale sale, Product product, int quantity)
+        public SaleItem(Product product, int quantity)
         {
-            Sale = sale;
             Product = product;
             Quantity = quantity;
             TotalPrice = product.UnitPrice * quantity;
         }
-
-        public Sale Sale { get; }
 
         public Product Product { get; }
 

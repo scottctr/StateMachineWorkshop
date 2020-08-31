@@ -25,7 +25,7 @@ namespace PointOfSaleStateManagement.Pages
 
         internal void AddItem(int productId, int quantity)
         {
-            var newSaleItem = new SaleItem(Sale, _productList[productId - 1], quantity);
+            var newSaleItem = new SaleItem(_productList[productId - 1], quantity);
 
             var result = Sale.AddItem(newSaleItem);
             if (result.IsSuccess)
