@@ -37,7 +37,7 @@ namespace PointOfSaleStateManagement.Data.States
 
         public override ActionResult Cancel()
         {
-            return Sale.Payments.Sum(p => p.Amount) > Sale.Change.Sum(c => c.Amount) 
+            return Sale.PaymentBalance > 0 
                 ? new ActionResult(isSuccess: false, "Cannot cancel sale until payments returned") 
                 : base.Cancel();
         }

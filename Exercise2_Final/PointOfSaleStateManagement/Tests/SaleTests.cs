@@ -136,9 +136,31 @@ namespace PointOfSaleStateManagement.Tests
         }
 
         [Fact]
-        public void Test_6_cannot_give_change_when_balance_less_than_0()
+        public void Test_6_cannot_give_change_when_payment_balance_0()
         {
-            // This rule negated by rule 8a
+            var sut = new Sale(1);
+
+            var result = sut.AddChange(new Change(1.00));
+
+            Assert.False(result.IsSuccess, "Able to add change to sale with negative balance");
+            Assert.Equal(0, sut.ChangeGiven);
+            Assert.Equal(0, sut.Balance);
+            Assert.Equal(0, sut.PaymentBalance);
+        }
+
+        [Fact]
+        public void Test_6_cannot_give_change_when_amount_exceeds_payment_balance()
+        {
+            var sut = new Sale(1);
+            var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
+            sut.AddItem(item1);
+            sut.AddPayment(new Payment(50));
+            var expectedBalance = sut.Balance;
+
+            var result = sut.AddChange(new Change(100));
+
+            Assert.False(result.IsSuccess, "Able to add change to sale with negative balance");
+            Assert.Equal(expectedBalance, sut.Balance);
         }
 
         [Fact]

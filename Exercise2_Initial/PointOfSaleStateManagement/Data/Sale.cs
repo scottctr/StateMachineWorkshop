@@ -7,16 +7,7 @@ namespace PointOfSaleStateManagement.Data
     {
         private readonly List<Change> _change = new List<Change>();
         private readonly List<Payment> _payments = new List<Payment>();
-
-        public int Id { get; }
-        public double AmountPaid { get; private set; }
-        public double ChangeGiven { get; private set; }
-
-        public double SubTotal { get; set; }
-
-        public IList<SaleItem> SaleItems { get; } = new List<SaleItem>();
-        public double Balance { get; private set; }
-        public int TotalItems { get; private set; }
+        private readonly List<SaleItem> _saleItems = new List<SaleItem>();
 
         public Sale(int id)
         {
@@ -31,7 +22,6 @@ namespace PointOfSaleStateManagement.Data
             return new ActionResult(isSuccess: true);
         }
 
-
         public ActionResult AddItem(SaleItem newItem)
         {
             var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == newItem.Product.Id);
@@ -42,7 +32,7 @@ namespace PointOfSaleStateManagement.Data
                 ReplaceItem(existingItem, newItem);
             }
             else
-            { SaleItems.Add(newItem); }
+            { _saleItems.Add(newItem); }
 
             UpdateAmounts();
 
@@ -57,20 +47,32 @@ namespace PointOfSaleStateManagement.Data
             return new ActionResult(isSuccess: true);
         }
 
+        public double AmountPaid { get; private set; }
+
+        public double Balance { get; private set; }
+
         public ActionResult Cancel()
         {
             return new ActionResult(isSuccess: false, "Not implemented");
         }
 
+        public double ChangeGiven { get; private set; }
+
         public ActionResult DeleteItem(int productId)
         {
-            SaleItems.Remove(SaleItems.FirstOrDefault(i => i.Product.Id == productId));
+            _saleItems.Remove(SaleItems.FirstOrDefault(i => i.Product.Id == productId));
             UpdateAmounts();
 
             return new ActionResult(isSuccess: true);
         }
 
+        public int Id { get; }
+
         public bool IsComplete => true; //TODO Sale only complete when paid or cancelled
+
+        public double PaymentBalance => AmountPaid - ChangeGiven;
+
+        public IReadOnlyList<SaleItem> SaleItems => _saleItems.AsReadOnly();
 
         public ActionResult SetItemQuantity(int productId, int newQuantity)
         {
@@ -85,9 +87,13 @@ namespace PointOfSaleStateManagement.Data
             return new ActionResult(isSuccess: true);
         }
 
+        public double SubTotal { get; set; }
+
+        public int TotalItems { get; private set; }
+
         private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
         {
-            SaleItems[SaleItems.IndexOf(existingItem)] = newItem;
+            _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
         }
 
         private void UpdateAmounts()

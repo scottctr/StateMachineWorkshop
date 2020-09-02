@@ -8,22 +8,7 @@ namespace PointOfSaleStateManagement.Data
     {
         private readonly List<Change> _change = new List<Change>();
         private readonly List<Payment> _payments = new List<Payment>();
-
-        public int Id { get; }
-        public double AmountPaid { get; private set; }
-        public double ChangeGiven { get; private set; }
-
-        public double SubTotal { get; set; }
-
-        public IList<SaleItem> SaleItems { get; } = new List<SaleItem>();
-        public double Balance { get; private set; }
-        public int TotalItems { get; private set; }
-
-        public bool IsCancelled { get; private set; }
-        public bool IsPaid => Math.Abs(Balance) < .001 && _payments.Any() && SaleItems.Any(i => i.Quantity > 0);
-        public bool IsOverpaid => Balance > 0 && !IsCancelled;
-        public bool IsOpen => !IsCancelled && !IsPaid && !IsOverpaid;
-        public bool IsComplete => IsPaid || IsCancelled;
+        private readonly List<SaleItem> _saleItems = new List<SaleItem>();
 
         public Sale(int id)
         {
@@ -34,6 +19,9 @@ namespace PointOfSaleStateManagement.Data
         {
             if (IsPaid || IsCancelled)
             { return new ActionResult(isSuccess: false, "Cannot give change on paid or cancelled sale"); }
+
+            if (change.Amount > PaymentBalance)
+            { return new ActionResult(isSuccess: false, "Change amount cannot exceed payment balance"); }
 
             _change.Add(change);
             UpdateAmounts();
@@ -53,7 +41,7 @@ namespace PointOfSaleStateManagement.Data
                 ReplaceItem(existingItem, newItem);
             }
             else
-            { SaleItems.Add(newItem); }
+            { _saleItems.Add(newItem); }
 
             UpdateAmounts();
 
@@ -73,6 +61,10 @@ namespace PointOfSaleStateManagement.Data
             return new ActionResult(isSuccess: true);
         }
 
+        public double AmountPaid { get; private set; }
+
+        public double Balance { get; private set; }
+
         public ActionResult Cancel()
         {
             if (IsPaid || IsCancelled)
@@ -85,16 +77,32 @@ namespace PointOfSaleStateManagement.Data
             return new ActionResult(isSuccess: true);
         }
 
+        public double ChangeGiven { get; private set; }
+
         public ActionResult DeleteItem(int productId)
         {
             if (IsPaid || IsCancelled)
             { return new ActionResult(isSuccess: false, "Cannot delete items from paid or cancelled sales"); }
 
-            SaleItems.Remove(SaleItems.FirstOrDefault(i => i.Product.Id == productId));
+            _saleItems.Remove(SaleItems.FirstOrDefault(i => i.Product.Id == productId));
             UpdateAmounts();
 
             return new ActionResult(isSuccess: true);
         }
+
+        public int Id { get; }
+
+        public bool IsCancelled { get; private set; }
+
+        public bool IsComplete => IsPaid || IsCancelled;
+
+        public bool IsOpen => !IsCancelled && !IsPaid && !IsOverpaid;
+
+        public bool IsOverpaid => Balance > 0 && !IsCancelled;
+
+        public bool IsPaid => Math.Abs(Balance) < .001 && _payments.Any() && SaleItems.Any(i => i.Quantity > 0);
+
+        public double PaymentBalance => AmountPaid - ChangeGiven;
 
         public ActionResult SetItemQuantity(int productId, int newQuantity)
         {
@@ -111,9 +119,15 @@ namespace PointOfSaleStateManagement.Data
             return new ActionResult(isSuccess: true);
         }
 
+        public double SubTotal { get; set; }
+
+        public IReadOnlyList<SaleItem> SaleItems => _saleItems.AsReadOnly();
+
+        public int TotalItems { get; private set; }
+
         private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
         {
-            SaleItems[SaleItems.IndexOf(existingItem)] = newItem;
+            _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
         }
 
         private void UpdateAmounts()
