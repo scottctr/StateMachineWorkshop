@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
+using PointOfSaleStateManagement.Business;
 using PointOfSaleStateManagement.Data;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("PointOfSaleStateManagement.Tests")]
 namespace PointOfSaleStateManagement.Pages
 {
     public partial class Index

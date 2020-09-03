@@ -1,4 +1,4 @@
-﻿using PointOfSaleStateManagement.Data;
+﻿using PointOfSaleStateManagement.Business;
 using System.Linq;
 using Xunit;
 

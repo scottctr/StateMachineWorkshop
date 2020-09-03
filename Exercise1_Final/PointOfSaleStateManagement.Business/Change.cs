@@ -1,4 +1,4 @@
-﻿namespace PointOfSaleStateManagement.Data
+﻿namespace PointOfSaleStateManagement.Business
 {
     public class Change
     {
