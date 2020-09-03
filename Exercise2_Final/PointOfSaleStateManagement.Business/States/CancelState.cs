@@ -1,4 +1,4 @@
-﻿namespace PointOfSaleStateManagement.Data.States
+﻿namespace PointOfSaleStateManagement.Business.States
 {
     public class CancelState : SaleStateBase
     {

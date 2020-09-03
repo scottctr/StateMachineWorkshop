@@ -1,4 +1,4 @@
-﻿namespace PointOfSaleStateManagement.Data
+﻿namespace PointOfSaleStateManagement.Business
 {
     //SaleItem is immutable to ensure all changes go through Sale so that we consolidate business rules there
     public class SaleItem

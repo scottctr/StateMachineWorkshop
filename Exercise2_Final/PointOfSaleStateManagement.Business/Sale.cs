@@ -1,8 +1,8 @@
-﻿using PointOfSaleStateManagement.Data.States;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using PointOfSaleStateManagement.Business.States;
 
-namespace PointOfSaleStateManagement.Data
+namespace PointOfSaleStateManagement.Business
 {
     public class Sale
     {
@@ -48,9 +48,9 @@ namespace PointOfSaleStateManagement.Data
             return _state.DeleteItem(productId);
         }
 
-        public bool IsComplete => _state.IsFinalState;
-
         public int Id { get; }
+
+        public bool IsComplete => _state.IsFinalState;
 
         public double PaymentBalance => AmountPaid - ChangeGiven;
 

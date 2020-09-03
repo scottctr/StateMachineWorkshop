@@ -2,7 +2,10 @@
 using PointOfSaleStateManagement.Data;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using PointOfSaleStateManagement.Business;
 
+[assembly: InternalsVisibleTo("PointOfSaleStateManagement.Tests")]
 namespace PointOfSaleStateManagement.Pages
 {
     public partial class Index

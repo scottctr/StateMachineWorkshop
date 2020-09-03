@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Linq;
 
-namespace PointOfSaleStateManagement.Data.States
+namespace PointOfSaleStateManagement.Business.States
 {
     public class OverpaidState : SaleStateBase
     {
