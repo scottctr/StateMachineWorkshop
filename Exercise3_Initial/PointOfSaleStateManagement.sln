@@ -5,6 +5,10 @@ VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointOfSaleStateManagement", "PointOfSaleStateManagement\PointOfSaleStateManagement.csproj", "{33A114E5-7775-411A-8444-FBD9E1C1A76F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PointOfSaleStateManagement.Business", "PointOfSaleStateManagement.Business\PointOfSaleStateManagement.Business.csproj", "{8AF463DC-8B0F-408E-BE15-B7775B2D4BA4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PointOfSaleStateManagement.Tests", "PointOfSaleStateManagement.Tests\PointOfSaleStateManagement.Tests.csproj", "{F196518B-3D81-4D05-A439-F435AA072038}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{33A114E5-7775-411A-8444-FBD9E1C1A76F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33A114E5-7775-411A-8444-FBD9E1C1A76F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33A114E5-7775-411A-8444-FBD9E1C1A76F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AF463DC-8B0F-408E-BE15-B7775B2D4BA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AF463DC-8B0F-408E-BE15-B7775B2D4BA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AF463DC-8B0F-408E-BE15-B7775B2D4BA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AF463DC-8B0F-408E-BE15-B7775B2D4BA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F196518B-3D81-4D05-A439-F435AA072038}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F196518B-3D81-4D05-A439-F435AA072038}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F196518B-3D81-4D05-A439-F435AA072038}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F196518B-3D81-4D05-A439-F435AA072038}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

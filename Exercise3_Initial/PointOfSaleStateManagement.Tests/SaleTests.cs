@@ -1,5 +1,6 @@
 ﻿using PointOfSaleStateManagement.Data;
 using System.Linq;
+using PointOfSaleStateManagement.Business;
 using Xunit;
 
 namespace PointOfSaleStateManagement.Tests
