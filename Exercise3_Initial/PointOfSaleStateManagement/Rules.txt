@@ -13,7 +13,7 @@
 * New Rules *
 *************
 5. Can only accept payment if balance < 0
-6. Skip - replaced by 8a
+6. Cannot give change amount that is greater than payment balance
 7. No changes to paid sales
    - Paid = 0 balance, 1+ items, 1+ payments
 8. Need to be able to cancel a sale
