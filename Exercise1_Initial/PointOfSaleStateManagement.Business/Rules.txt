@@ -13,7 +13,7 @@
 * New Rules *
 *************
 5. Can only accept payment if balance < 0
-6. Cannot give change amount that is greater than payment balance
+6. Can only give change if customer has over paid
 7. No changes to paid sales
    - Paid = 0 balance, 1+ items, 1+ payments
 

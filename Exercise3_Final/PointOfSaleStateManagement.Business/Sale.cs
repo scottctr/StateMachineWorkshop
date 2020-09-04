@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PointOfSaleStateManagement.Data
+namespace PointOfSaleStateManagement.Business
 {
     public class Sale
     {
