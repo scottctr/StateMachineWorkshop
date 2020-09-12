@@ -119,6 +119,23 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
+        private void SetStatus()
+        {
+            if (IsOpen)
+            { Status = "Open"; }
+
+            if (IsCancelled)
+            { Status = "Cancelled"; }
+
+            if (IsPaid)
+            { Status = "Paid"; }
+
+            //if (Sale.IsOverpaid)
+            Status = "Overpaid";
+        }
+
+        public string Status { get; private set; } = "Open";
+
         public double SubTotal { get; set; }
 
         public IReadOnlyList<SaleItem> SaleItems => _saleItems.AsReadOnly();
@@ -137,6 +154,8 @@ namespace PointOfSaleStateManagement.Business
             UpdateAmountPaid();
             UpdateChangeGiven();
             UpdateBalance();
+
+            SetStatus();
         }
 
         private void UpdateAmountPaid()

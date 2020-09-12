@@ -1,7 +1,7 @@
 ﻿@page "/"
 
 <div>
-    <img style="vertical-align: middle" src="Images\gas-station-final-700h-505x400.jpg" alt="Pop's Store and Gas Station - Final Image" width="189" height="150" srcset="https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-505x400.jpg 505w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-300x238.jpg 300w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h.jpg 884w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-32x25.jpg 32w, https://www.gingercooklive.gallery/wp-content/uploads/2016/06/gas-station-final-700h-50x40.jpg 50w" sizes="(max-width: 505px) 100vw, 505px" />
+    <img style="vertical-align: middle" src="Images\gas-station-final-700h-505x400.jpg" alt="Pop's Store and Gas Station - Final Image" width="189" height="150" sizes="(max-width: 505px) 100vw, 505px" />
     <span style="font-size: 66px; color: brown">Pop's Gas and Stuff</span>
 </div>
 
@@ -14,10 +14,7 @@
             <p><b>Order #:</b> @Sale.Id.ToString()</p>
         </div>
         <div class="column">
-            @*<div><i class="@(Sale.IsOpen ? "fa fa-check" : "fa fa-times")" style="@(Sale.IsOpen ? "color: green" : "")"/> Open</div>
-        <div><i class="@(Sale.IsOverpaid ? "fa fa-exclamation" : "fa fa-times")" style="@(Sale.IsOverpaid ? "color: yellow" : "")"/> Overpaid</div>
-        <div><i class="@(Sale.IsCancelled ? "fa fa-exclamation" : "fa fa-times")" style="@(Sale.IsCancelled ? "color: red" : "")"/> Cancelled</div>
-        <div><i class="@(Sale.IsPaid ? "fa fa-check" : "fa fa-times")" style="@(Sale.IsPaid ? "color: green" : "")"/> Paid</div>*@
+            <div>Status: <b>@Sale.Status</b></div>
         </div>
     </div>
 </div>
@@ -33,16 +30,16 @@
         <button @onclick="@(e => AddItem(productId: 4, quantity: 1))" style="width: 115px; height: 115px; font-size: 25px"><i class="@($"fa fa-{_productList[4 - 1].ImageClassName}")"></i><div>@_productList[4 - 1].Name</div><div>@_productList[4 - 1].UnitPrice.ToString("C")</div></button>
     </div>
 
-    <br/>
+    <br />
 
     <table class="sale-items">
         <tr class="border_bottom">
             <th><b>Item</b></th>
             <th><b>Qty</b></th>
-            <th/>
+            <th />
             <th><b>Each</b></th>
             <th><b>Total</b></th>
-            <th style="width: 30px"/>
+            <th style="width: 30px" />
         </tr>
         @{
             foreach (var saleItem in Sale.SaleItems)
@@ -63,14 +60,14 @@
         }
     </table>
 
-    <br/>
+    <br />
 
     <div>
-        <div><input type="text" inputmode="numeric" @onchange="PaymentAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, Sale.Balance * -1).ToString("C"))"/><button @onclick="AddPayment" style="width: 120px">Add Payment</button></div>
-        <div><input type="text" inputmode="numeric" @onchange="ChangeAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, Sale.Balance).ToString("C"))"/><button @onclick="GiveChange" style="width: 120px">Give Change</button></div>
+        <div><input type="text" inputmode="numeric" @onchange="PaymentAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, Sale.Balance * -1).ToString("C"))" /><button @onclick="AddPayment" style="width: 120px">Add Payment</button></div>
+        <div><input type="text" inputmode="numeric" @onchange="ChangeAmountChanged" min="1" step="0.01" style="width: 100px; text-align: right" pattern="\d*.\d{2}" value="@(Math.Max(0, Sale.Balance).ToString("C"))" /><button @onclick="GiveChange" style="width: 120px">Give Change</button></div>
     </div>
 
-    <br/>
+    <br />
 
     <table>
         <tr><td><b>Items:</b></td><td style="text-align: right">@Sale.TotalItems.ToString()</td></tr>
@@ -95,11 +92,11 @@
         @{
             foreach (var entry in _log)
             {
-            <tr @key=entry>
-                <td>@entry.Id</td>
-                <td>@entry.Timestamp.ToShortTimeString()</td>
-                <td>@entry.Entry</td>
-            </tr>
+                <tr @key=entry>
+                    <td>@entry.Id</td>
+                    <td>@entry.Timestamp.ToShortTimeString()</td>
+                    <td>@entry.Entry</td>
+                </tr>
             }
         }
     </table>

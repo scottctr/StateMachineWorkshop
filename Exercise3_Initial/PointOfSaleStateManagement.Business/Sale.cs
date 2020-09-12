@@ -88,6 +88,8 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
+        public string Status { get; private set; }
+
         public double SubTotal { get; set; }
 
         public int TotalItems { get; private set; }

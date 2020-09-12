@@ -122,7 +122,22 @@ namespace PointOfSaleStateManagement.Tests
         }
 
         [Fact]
-        public void Test_6_cannot_give_change_when_balance_0()
+        public void Test_6_can_give_change_when_amount_equals_payment_balance()
+        {
+            var sut = new Sale(1);
+            var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
+            sut.AddItem(item1);
+            sut.AddPayment(new Payment(50));
+            var expectedBalance = sut.Balance;
+
+            var result = sut.AddChange(new Change(50));
+
+            Assert.True(result.IsSuccess, "Unable to give change when change amount equals payment balance");
+            Assert.Equal(item1.TotalPrice * -1, sut.Balance);
+        }
+
+        [Fact]
+        public void Test_6_cannot_give_change_on_paid_sale()
         {
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PointOfSaleStateManagement.Business.States;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PointOfSaleStateManagement.Business
@@ -8,6 +9,9 @@ namespace PointOfSaleStateManagement.Business
         private readonly List<Change> _change = new List<Change>();
         private readonly List<Payment> _payments = new List<Payment>();
         private readonly List<SaleItem> _saleItems = new List<SaleItem>();
+
+        // Reference to current state
+        private SaleStateBase _state;
 
         public Sale(int id)
         {
@@ -87,6 +91,8 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
+        public string Status => _state.StatusName;
+
         public double SubTotal { get; set; }
 
         public int TotalItems { get; private set; }
@@ -94,6 +100,12 @@ namespace PointOfSaleStateManagement.Business
         private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
         {
             _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
+        }
+
+        // Method to set state
+        internal void TransitionTo(SaleStateBase newState)
+        {
+            _state = newState;
         }
 
         private void UpdateAmounts()

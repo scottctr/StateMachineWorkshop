@@ -90,21 +90,6 @@ namespace PointOfSaleStateManagement.Pages
             { LogActionError("Delete item", result); }
         }
 
-        private string GetSaleState()
-        {
-            if (Sale.IsOpen)
-            { return "Open"; }
-
-            if (Sale.IsCancelled)
-            { return "Cancelled"; }
-
-            if (Sale.IsPaid)
-            { return "Paid"; }
-
-            //if (Sale.IsOverpaid)
-            return "Overpaid";
-        }
-
         private void GiveChange()
         {
             var result = Sale.AddChange(new Change(_changeAmount));
@@ -125,7 +110,7 @@ namespace PointOfSaleStateManagement.Pages
             { return; }
 
             _log.Add(new LogEntry($"   -> Balance: { Sale.Balance:C}"));
-            _log.Add(new LogEntry($"   -> State: { GetSaleState() }"));
+            _log.Add(new LogEntry($"   -> State: { Sale.Status }"));
         }
 
         private void ChangeAmountChanged(ChangeEventArgs args)
