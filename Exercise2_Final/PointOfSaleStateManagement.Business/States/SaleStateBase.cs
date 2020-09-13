@@ -15,22 +15,22 @@
 
         public virtual ActionResult AddChange(Change change)
         {
-            return Sale.AddChangeRaw(change);
+            return Sale.AddChangeInternal(change);
         }
 
         public virtual ActionResult AddItem(SaleItem newItem)
         {
-            return Sale.AddItemRaw(newItem);
+            return Sale.AddItemInternal(newItem);
         }
 
         public virtual ActionResult AddPayment(Payment payment)
         {
-            return Sale.AddPaymentRaw(payment);
+            return Sale.AddPaymentInternal(payment);
         }
 
         public virtual ActionResult Cancel()
         {
-            var result = Sale.CancelRaw();
+            var result = Sale.CancelInternal();
             if (result.IsSuccess)
             { Sale.TransitionTo(new CancelState(Sale)); }
 
@@ -39,12 +39,12 @@
 
         public virtual ActionResult DeleteItem(int productId)
         {
-            return Sale.DeleteItemRaw(productId);
+            return Sale.DeleteItemInternal(productId);
         }
 
         public virtual ActionResult SetItemQuantity(int productId, int newQuantity)
         {
-            return Sale.SetItemQuantityRaw(productId, newQuantity);
+            return Sale.SetItemQuantityInternal(productId, newQuantity);
         }
     }
 }

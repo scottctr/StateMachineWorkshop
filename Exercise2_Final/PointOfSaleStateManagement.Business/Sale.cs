@@ -68,7 +68,7 @@ namespace PointOfSaleStateManagement.Business
 
         public int TotalItems { get; internal set; }
 
-        internal ActionResult AddChangeRaw(Change change)
+        internal ActionResult AddChangeInternal(Change change)
         {
             if (change.Amount > PaymentBalance)
             { return new ActionResult(isSuccess: false, "Change amount cannot exceed payment balance"); }
@@ -78,7 +78,7 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
-        internal ActionResult AddItemRaw(SaleItem newItem)
+        internal ActionResult AddItemInternal(SaleItem newItem)
         {
             var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == newItem.Product.Id);
 
@@ -95,7 +95,7 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
-        internal ActionResult AddPaymentRaw(Payment payment)
+        internal ActionResult AddPaymentInternal(Payment payment)
         {
             if (Balance >= 0)
             { return new ActionResult(isSuccess: false, "Cannot add payment to sale with balance equal or greater than 0"); }
@@ -108,14 +108,14 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
-        internal ActionResult CancelRaw()
+        internal ActionResult CancelInternal()
         {
             return PaymentBalance > 0 
                 ? new ActionResult(isSuccess: false, "Cannot cancel sale until payments returned") 
                 : new ActionResult(isSuccess: true);
         }
 
-        internal ActionResult DeleteItemRaw(int productId)
+        internal ActionResult DeleteItemInternal(int productId)
         {
             _saleItems.Remove(SaleItems.FirstOrDefault(i => i.Product.Id == productId));
             UpdateAmounts();
@@ -138,7 +138,7 @@ namespace PointOfSaleStateManagement.Business
             _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
         }
 
-        internal ActionResult SetItemQuantityRaw(int productId, int newQuantity)
+        internal ActionResult SetItemQuantityInternal(int productId, int newQuantity)
         {
             var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == productId);
             if (existingItem is null)
