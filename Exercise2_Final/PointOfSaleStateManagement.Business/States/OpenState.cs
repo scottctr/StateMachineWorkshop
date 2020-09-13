@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PointOfSaleStateManagement.Business.States
+﻿namespace PointOfSaleStateManagement.Business.States
 {
     public class OpenState : SaleStateBase
     {

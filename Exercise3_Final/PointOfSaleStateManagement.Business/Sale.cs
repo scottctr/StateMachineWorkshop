@@ -70,7 +70,7 @@ namespace PointOfSaleStateManagement.Business
 
         public int TotalItems { get; internal set; }
 
-        internal void AddSaleItemRaw(SaleItem newItem)
+        internal void AddSaleItemInternal(SaleItem newItem)
         {
             var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == newItem.Product.Id);
 
@@ -85,19 +85,19 @@ namespace PointOfSaleStateManagement.Business
             UpdateAmounts();
         }
 
-        internal void AddChangeRaw(Change change)
+        internal void AddChangeInternal(Change change)
         {
             _change.Add(change);
             UpdateAmounts();
         }
 
-        internal void AddPaymentRaw(Payment payment)
+        internal void AddPaymentInternal(Payment payment)
         {
             _payments.Add(payment);
             UpdateAmounts();
         }
 
-        internal void DeleteSaleItemRaw(SaleItem item)
+        internal void DeleteSaleItemInternal(SaleItem item)
         {
             _saleItems.Remove(item);
             UpdateAmounts();
@@ -136,7 +136,7 @@ namespace PointOfSaleStateManagement.Business
             _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
         }
 
-        internal void SetItemQuantityRaw(SaleItem updatedItem)
+        internal void SetItemQuantityInternal(SaleItem updatedItem)
         {
             ReplaceItem(SaleItems.First(i => i.Product.Id == updatedItem.Product.Id), updatedItem);
             UpdateAmounts();
