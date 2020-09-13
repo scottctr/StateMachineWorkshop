@@ -1,7 +1,7 @@
-﻿using NStateManager.Sync;
+﻿using NStateManager.Export;
+using NStateManager.Sync;
 using System;
 using System.Diagnostics;
-using NStateManager.Export;
 
 namespace PointOfSaleStateManagement.Business
 {
@@ -85,6 +85,7 @@ namespace PointOfSaleStateManagement.Business
                 .MakeSubstateOf(_stateMachine.ConfigureState(SaleState.Finalized));
 
 #if DEBUG
+            // This is how to export state configuration to Csv and/or DotGraph
             var configSummary = _stateMachine.GetSummary();
             Debug.WriteLine(CsvExporter<SaleState, SaleEvent>.Export(configSummary));
             Debug.WriteLine(DotGraphExporter<SaleState, SaleEvent>.Export(configSummary));

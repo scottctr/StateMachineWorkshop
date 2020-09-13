@@ -5,9 +5,9 @@ VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointOfSaleStateManagement", "PointOfSaleStateManagement\PointOfSaleStateManagement.csproj", "{33A114E5-7775-411A-8444-FBD9E1C1A76F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PointOfSaleStateManagement.Business", "PointOfSaleStateManagement.Business\PointOfSaleStateManagement.Business.csproj", "{36D72754-E003-4F4D-B965-89F4CC20E92A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointOfSaleStateManagement.Business", "PointOfSaleStateManagement.Business\PointOfSaleStateManagement.Business.csproj", "{36D72754-E003-4F4D-B965-89F4CC20E92A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PointOfSaleStateManagement.Tests", "PointOfSaleStateManagement.Tests\PointOfSaleStateManagement.Tests.csproj", "{FD511098-6BD2-4609-AE94-B1E8F0277BFB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PointOfSaleStateManagement.Tests", "PointOfSaleStateManagement.Tests\PointOfSaleStateManagement.Tests.csproj", "{FD511098-6BD2-4609-AE94-B1E8F0277BFB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
