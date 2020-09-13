@@ -38,8 +38,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_9_can_start_new_sale_when_current_sale_paid()
         {
-            // expected to fail until exercise complete
-
             var sut = new Index();
             sut.AddItem(productId: 1, quantity: 1);
             sut.AddPayment(sut.Sale.SaleItems.First().TotalPrice);
@@ -52,8 +50,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_9_can_start_new_sale_when_current_sale_cancelled()
         {
-            // expected to fail until exercise complete
-
             var sut = new Index();
             sut.AddItem(productId: 1, quantity: 1);
             sut.Sale.Cancel();

@@ -31,7 +31,6 @@
   -- i.e. don't worry about adding the constraints to the UI for today's exercises
 - When rules are violated return an ActionResult with IsSuccess = false and a meaningful error message
   -- Otherwise just return an ActionResult with IsSuccess = true
-- Be sure to address all 3 TODOs (most outside of Sale.cs)
 - To help ensure rules are implemented correctly
   -- All unit tests should pass once rules implemented
   -- There is a log at the bottom of the UI to help trace what's happened with the current sale

@@ -96,8 +96,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_5_cannot_add_payment_when_balance_0()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -112,8 +110,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_5_cannot_add_payment_when_balance_greater_than_0()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -142,8 +138,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_6_cannot_give_change_when_balance_0()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -186,8 +180,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_7_cannot_add_item_to_paid_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -204,8 +196,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_7_cannot_change_item_quantity_on_paid_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -222,8 +212,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_7_cannot_delete_item_to_paid_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -240,8 +228,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_7_cannot_pay_on_paid_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -257,8 +243,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_7_cannot_give_change_on_paid_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -274,8 +258,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_8_can_cancel()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             var item2 = new SaleItem(new Product(2, "product2", "product2", "product2s", 2.22, imageClassName: "test"), 2);
@@ -305,8 +287,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_8b_cannot_add_items_on_cancelled_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -321,8 +301,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_8b_cannot_change_item_quantity_on_cancelled_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -337,8 +315,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_8b_cannot_delete_item_on_cancelled_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -353,8 +329,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_8b_cannot_pay_on_cancelled_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             sut.AddItem(item1);
@@ -369,8 +343,6 @@ namespace PointOfSaleStateManagement.Tests
         [Fact]
         public void Test_8b_cannot_give_change_to_cancelled_sale()
         {
-            // expected to fail until exercise complete
-
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
             sut.AddItem(item1);
