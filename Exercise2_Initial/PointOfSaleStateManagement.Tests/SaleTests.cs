@@ -132,7 +132,6 @@ namespace PointOfSaleStateManagement.Tests
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
             sut.AddPayment(new Payment(50));
-            var expectedBalance = sut.Balance;
 
             var result = sut.AddChange(new Change(50));
 
@@ -286,7 +285,7 @@ namespace PointOfSaleStateManagement.Tests
             var result = sut.Cancel();
 
             Assert.True(result.IsSuccess, "Was unable to cancel open sale");
-            Assert.True(false /*TODO isCancelled*/, "Successfully cancelled sale not marked cancelled");
+            Assert.True(sut.IsCancelled, "Successfully cancelled sale not marked cancelled");
         }
 
         [Fact]
@@ -300,7 +299,7 @@ namespace PointOfSaleStateManagement.Tests
             var result = sut.Cancel();
 
             Assert.False(result.IsSuccess, "Cancelled sale with a payment balance");
-            Assert.False(false /*TODO isCancelled*/, "Successfully cancelled sale not marked cancelled");
+            Assert.False(sut.IsCancelled, "Successfully cancelled sale not marked cancelled");
         }
 
         [Fact]

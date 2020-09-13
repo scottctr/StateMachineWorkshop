@@ -21,14 +21,22 @@ namespace PointOfSaleStateManagement.Business
 
         public ActionResult AddChange(Change change)
         {
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot give change on paid or cancelled sale"); }
+
+            if (change.Amount > PaymentBalance)
+            { return new ActionResult(isSuccess: false, "Change amount cannot exceed payment balance"); }
+
             _change.Add(change);
             UpdateAmounts();
-
             return new ActionResult(isSuccess: true);
         }
 
         public ActionResult AddItem(SaleItem newItem)
         {
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot add items to paid or cancelled sales"); }
+
             var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == newItem.Product.Id);
 
             if (existingItem != null)
@@ -46,9 +54,14 @@ namespace PointOfSaleStateManagement.Business
 
         public ActionResult AddPayment(Payment payment)
         {
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot add payment to cancelled or paid sales"); }
+
+            if (Balance >= 0)
+            { return new ActionResult(isSuccess: false, "Cannot add payment to sale with balance equal or greater than 0"); }
+
             _payments.Add(payment);
             UpdateAmounts();
-
             return new ActionResult(isSuccess: true);
         }
 
@@ -58,13 +71,23 @@ namespace PointOfSaleStateManagement.Business
 
         public ActionResult Cancel()
         {
-            return new ActionResult(isSuccess: false, "Not implemented");
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot cancel paid or cancelled sales"); }
+
+            if (_payments.Sum(p => p.Amount) > _change.Sum(c => c.Amount))
+            { return new ActionResult(isSuccess: false, "Cannot cancel sale until payments returned"); }
+
+            IsCancelled = true;
+            return new ActionResult(isSuccess: true);
         }
 
         public double ChangeGiven { get; private set; }
 
         public ActionResult DeleteItem(int productId)
         {
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot delete items from paid or cancelled sales"); }
+
             _saleItems.Remove(SaleItems.FirstOrDefault(i => i.Product.Id == productId));
             UpdateAmounts();
 
@@ -73,16 +96,24 @@ namespace PointOfSaleStateManagement.Business
 
         public int Id { get; }
 
-        public bool IsComplete => true; //TODO Sale only complete when paid or cancelled
+        public bool IsCancelled { get; private set; }
+
+        public bool IsComplete => IsPaid || IsCancelled;
+
+        public bool IsOpen => !IsCancelled && !IsPaid && !IsOverpaid;
+
+        public bool IsOverpaid => Balance > 0 && !IsCancelled;
+
+        public bool IsPaid => Math.Abs(Balance) < .001 && _payments.Any() && SaleItems.Any(i => i.Quantity > 0);
 
         public double PaymentBalance => AmountPaid - ChangeGiven;
 
-        public IReadOnlyList<SaleItem> SaleItems => _saleItems.AsReadOnly();
-
         public ActionResult SetItemQuantity(int productId, int newQuantity)
         {
-            var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == productId);
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "Cannot change item quantity on paid or cancelled sales"); }
 
+            var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == productId);
             if (existingItem is null)
             { return new ActionResult(isSuccess: false, $"ProductId {productId} not found in sale items."); }
 
@@ -92,36 +123,32 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
-        public string Status => _state.StatusName;
+        private void SetStatus()
+        {
+            if (IsOpen)
+            { Status = "Open"; }
+
+            if (IsCancelled)
+            { Status = "Cancelled"; }
+
+            if (IsPaid)
+            { Status = "Paid"; }
+
+            //if (Sale.IsOverpaid)
+            Status = "Overpaid";
+        }
+
+        public string Status { get; private set; } = "Open";
 
         public double SubTotal { get; set; }
 
+        public IReadOnlyList<SaleItem> SaleItems => _saleItems.AsReadOnly();
+
         public int TotalItems { get; private set; }
-
-        internal bool HasPositiveBalance()
-        {
-            return Balance > 0;
-        }
-
-        internal bool IsCancellable()
-        {
-            return Math.Abs(PaymentBalance) < 0.001;
-        }
-
-        internal bool IsPaid()
-        {
-            return Math.Abs(Balance) < 0.001 && SaleItems.Any() && AmountPaid > 0;
-        }
 
         private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
         {
             _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
-        }
-
-        // Method to set state
-        internal void TransitionTo(SaleStateBase newState)
-        {
-            _state = newState;
         }
 
         private void UpdateAmounts()
@@ -131,6 +158,8 @@ namespace PointOfSaleStateManagement.Business
             UpdateAmountPaid();
             UpdateChangeGiven();
             UpdateBalance();
+
+            SetStatus();
         }
 
         private void UpdateAmountPaid()
