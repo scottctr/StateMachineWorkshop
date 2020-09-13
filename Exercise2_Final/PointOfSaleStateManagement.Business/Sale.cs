@@ -10,6 +10,8 @@ namespace PointOfSaleStateManagement.Business
         private readonly List<Change> _change = new List<Change>();
         private readonly List<Payment> _payments = new List<Payment>();
         private readonly List<SaleItem> _saleItems = new List<SaleItem>();
+
+        // Reference to current state
         private SaleStateBase _state;
 
         public Sale(int id)
@@ -23,51 +25,6 @@ namespace PointOfSaleStateManagement.Business
             return _state.AddChange(change);
         }
 
-        public ActionResult AddItem(SaleItem newItem)
-        {
-            return _state.AddItem(newItem);
-        }
-
-        public ActionResult AddPayment(Payment payment)
-        {
-            return _state.AddPayment(payment);
-        }
-
-        public double AmountPaid { get; internal set; }
-
-        public double Balance { get; internal set; }
-
-        public double ChangeGiven { get; internal set; }
-
-        public ActionResult Cancel()
-        {
-            return _state.Cancel();
-        }
-
-        public ActionResult DeleteItem(int productId)
-        {
-            return _state.DeleteItem(productId);
-        }
-
-        public int Id { get; }
-
-        public bool IsComplete => _state.IsFinalState;
-
-        public double PaymentBalance => AmountPaid - ChangeGiven;
-
-        public IReadOnlyList<SaleItem> SaleItems => _saleItems;
-
-        public ActionResult SetItemQuantity(int productId, int newQuantity)
-        {
-            return _state.SetItemQuantity(productId, newQuantity);
-        }
-
-        public string Status => _state.StatusName;
-
-        public double SubTotal { get; set; }
-
-        public int TotalItems { get; internal set; }
-
         internal ActionResult AddChangeInternal(Change change)
         {
             if (change.Amount > PaymentBalance)
@@ -76,6 +33,11 @@ namespace PointOfSaleStateManagement.Business
             _change.Add(change);
             UpdateAmounts();
             return new ActionResult(isSuccess: true);
+        }
+
+        public ActionResult AddItem(SaleItem newItem)
+        {
+            return _state.AddItem(newItem);
         }
 
         internal ActionResult AddItemInternal(SaleItem newItem)
@@ -95,11 +57,13 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
+        public ActionResult AddPayment(Payment payment)
+        {
+            return _state.AddPayment(payment);
+        }
+
         internal ActionResult AddPaymentInternal(Payment payment)
         {
-            if (Balance >= 0)
-            { return new ActionResult(isSuccess: false, "Cannot add payment to sale with balance equal or greater than 0"); }
-
             if (Balance >= 0)
             { return new ActionResult(isSuccess: false, "Cannot add payment to sale with balance equal or greater than 0"); }
 
@@ -108,11 +72,28 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
+        public double AmountPaid { get; private set; }
+
+        public double Balance { get; private set; }
+
+        public ActionResult Cancel()
+        {
+            return _state.Cancel();
+        }
+
         internal ActionResult CancelInternal()
         {
-            return PaymentBalance > 0 
-                ? new ActionResult(isSuccess: false, "Cannot cancel sale until payments returned") 
-                : new ActionResult(isSuccess: true);
+            if (_payments.Sum(p => p.Amount) > _change.Sum(c => c.Amount))
+            { return new ActionResult(isSuccess: false, "Cannot cancel sale until payments returned"); }
+
+            return new ActionResult(isSuccess: true);
+        }
+
+        public double ChangeGiven { get; private set; }
+
+        public ActionResult DeleteItem(int productId)
+        {
+            return _state.DeleteItem(productId);
         }
 
         internal ActionResult DeleteItemInternal(int productId)
@@ -123,19 +104,15 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
-        internal bool HasPositiveBalance()
-        {
-            return Balance > 0;
-        }
+        public int Id { get; }
 
-        internal bool IsPaid()
-        {
-            return Math.Abs(Balance) < 0.001 && SaleItems.Any() && AmountPaid > 0;
-        }
+        public bool IsComplete => _state.IsFinalState;
 
-        private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
+        public double PaymentBalance => AmountPaid - ChangeGiven;
+
+        public ActionResult SetItemQuantity(int productId, int newQuantity)
         {
-            _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
+            return _state.SetItemQuantity(productId, newQuantity);
         }
 
         internal ActionResult SetItemQuantityInternal(int productId, int newQuantity)
@@ -148,6 +125,26 @@ namespace PointOfSaleStateManagement.Business
             UpdateAmounts();
 
             return new ActionResult(isSuccess: true);
+        }
+
+        public string Status => _state.StatusName;
+
+        public double SubTotal { get; set; }
+
+        public IReadOnlyList<SaleItem> SaleItems => _saleItems.AsReadOnly();
+
+        public int TotalItems { get; private set; }
+
+        internal bool HasPositiveBalance()
+        {
+            return Balance > 0;
+        }
+
+        internal bool IsPaid => Math.Abs(Balance) < .001 && _payments.Any() && SaleItems.Any(i => i.Quantity > 0);
+
+        private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
+        {
+            _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
         }
 
         internal void TransitionTo(SaleStateBase newState)

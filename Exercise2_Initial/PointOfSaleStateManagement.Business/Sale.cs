@@ -123,6 +123,11 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
+        internal bool HasPositiveBalance()
+        {
+            return Balance > 0;
+        }
+
         private void SetStatus()
         {
             if (IsOpen)
