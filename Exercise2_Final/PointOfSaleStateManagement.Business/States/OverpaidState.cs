@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace PointOfSaleStateManagement.Business.States
+﻿namespace PointOfSaleStateManagement.Business.States
 {
     public class OverpaidState : SaleStateBase
     {
@@ -36,7 +34,7 @@ namespace PointOfSaleStateManagement.Business.States
 
         public override ActionResult Cancel()
         {
-            return Sale.PaymentBalance > 0 
+            return Sale.HasPositiveBalance() 
                 ? new ActionResult(isSuccess: false, "Cannot cancel sale until payments returned") 
                 : base.Cancel();
         }
@@ -54,9 +52,9 @@ namespace PointOfSaleStateManagement.Business.States
 
         private void CheckForTransition()
         {
-            if (Math.Abs(Sale.Balance) < 0.001)
+            if (Sale.IsPaid())
             { Sale.TransitionTo(new PaidState(Sale)); }
-            else if (Sale.Balance < 0)
+            else if (!Sale.HasPositiveBalance())
             { Sale.TransitionTo(new OpenState(Sale)); }
         }
     }

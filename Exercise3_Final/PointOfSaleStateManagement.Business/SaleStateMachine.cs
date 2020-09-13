@@ -1,6 +1,7 @@
 ﻿using NStateManager.Sync;
 using System;
-using System.Linq;
+using System.Diagnostics;
+using NStateManager.Export;
 
 namespace PointOfSaleStateManagement.Business
 {
@@ -58,12 +59,12 @@ namespace PointOfSaleStateManagement.Business
                 .AddTriggerAction<Payment>(SaleEvent.Pay, (sale, payment) => _sale.AddPaymentRaw(payment))
                 .AddTriggerAction<Change>(SaleEvent.GiveChange, (sale, change) => ProcessChangeRequest(change))
                 .AddTriggerAction(SaleEvent.Cancel, sale => ProcessCancelRequest())
-                .AddTransition(SaleEvent.Pay, SaleState.Overpaid, condition: HasPositiveBalance)
-                .AddTransition(SaleEvent.Pay, SaleState.Paid, IsPaid)
-                .AddTransition(SaleEvent.SetItemQuantity, SaleState.Overpaid, condition: HasPositiveBalance)
-                .AddTransition(SaleEvent.SetItemQuantity, SaleState.Paid, IsPaid)
-                .AddTransition(SaleEvent.GiveChange, SaleState.Paid, IsPaid)
-                .AddTransition(SaleEvent.Cancel, SaleState.Cancelled, IsCancellable);
+                .AddTransition(SaleEvent.Pay, SaleState.Overpaid, condition: _=> _sale.HasPositiveBalance())
+                .AddTransition(SaleEvent.Pay, SaleState.Paid, _=> _sale.IsPaid())
+                .AddTransition(SaleEvent.SetItemQuantity, SaleState.Overpaid, condition: _=> _sale.HasPositiveBalance())
+                .AddTransition(SaleEvent.SetItemQuantity, SaleState.Paid, _ => _sale.IsPaid())
+                .AddTransition(SaleEvent.GiveChange, SaleState.Paid, _ => _sale.IsPaid())
+                .AddTransition(SaleEvent.Cancel, SaleState.Cancelled, _ => _sale.IsCancellable());
 
             _stateMachine.ConfigureState(SaleState.Overpaid)
                 .MakeSubstateOf(_stateMachine.ConfigureState(SaleState.Open))
@@ -82,6 +83,12 @@ namespace PointOfSaleStateManagement.Business
 
             _stateMachine.ConfigureState(SaleState.Paid)
                 .MakeSubstateOf(_stateMachine.ConfigureState(SaleState.Finalized));
+
+#if DEBUG
+            var configSummary = _stateMachine.GetSummary();
+            Debug.WriteLine(CsvExporter<SaleState, SaleEvent>.Export(configSummary));
+            Debug.WriteLine(DotGraphExporter<SaleState, SaleEvent>.Export(configSummary));
+#endif
         }
 
         private void ProcessCancelRequest()
@@ -96,21 +103,6 @@ namespace PointOfSaleStateManagement.Business
             { throw new InvalidOperationException("Change amount cannot exceed payment balance."); }
 
             _sale.AddChangeRaw(change);
-        }
-
-        private static bool HasPositiveBalance(Sale sale)
-        {
-            return sale.Balance > 0;
-        }
-
-        private static bool IsCancellable(Sale sale)
-        {
-            return Math.Abs(sale.PaymentBalance) < 0.001;
-        }
-
-        private static bool IsPaid(Sale sale)
-        {
-            return Math.Abs(sale.Balance) < 0.001 && sale.SaleItems.Any() && sale.AmountPaid > 0;
         }
     }
 }

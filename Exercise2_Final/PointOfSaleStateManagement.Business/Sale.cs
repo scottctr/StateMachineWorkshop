@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using PointOfSaleStateManagement.Business.States;
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using PointOfSaleStateManagement.Business.States;
 
 namespace PointOfSaleStateManagement.Business
 {
@@ -122,6 +123,21 @@ namespace PointOfSaleStateManagement.Business
             return new ActionResult(isSuccess: true);
         }
 
+        internal bool HasPositiveBalance()
+        {
+            return Balance > 0;
+        }
+
+        internal bool IsPaid()
+        {
+            return Math.Abs(Balance) < 0.001 && SaleItems.Any() && AmountPaid > 0;
+        }
+
+        private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
+        {
+            _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
+        }
+
         internal ActionResult SetItemQuantityRaw(int productId, int newQuantity)
         {
             var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == productId);
@@ -132,11 +148,6 @@ namespace PointOfSaleStateManagement.Business
             UpdateAmounts();
 
             return new ActionResult(isSuccess: true);
-        }
-
-        private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
-        {
-            _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
         }
 
         internal void TransitionTo(SaleStateBase newState)

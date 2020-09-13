@@ -31,9 +31,9 @@ namespace PointOfSaleStateManagement.Business.States
 
         private void CheckForTransition()
         {
-            if (Sale.Balance > 0)
+            if (Sale.HasPositiveBalance())
             { Sale.TransitionTo(new OverpaidState(Sale)); }
-            else if (Math.Abs(Sale.Balance) < 0.001)
+            else if (Sale.IsPaid())
             { Sale.TransitionTo(new PaidState(Sale)); }
         }
     }

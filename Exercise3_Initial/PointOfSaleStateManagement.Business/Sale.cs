@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PointOfSaleStateManagement.Business
@@ -93,6 +94,21 @@ namespace PointOfSaleStateManagement.Business
         public double SubTotal { get; set; }
 
         public int TotalItems { get; private set; }
+
+        internal bool HasPositiveBalance()
+        {
+            return Balance > 0;
+        }
+
+        internal bool IsCancellable()
+        {
+            return Math.Abs(PaymentBalance) < 0.001;
+        }
+
+        internal bool IsPaid()
+        {
+            return Math.Abs(Balance) < 0.001 && SaleItems.Any() && AmountPaid > 0;
+        }
 
         private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
         {

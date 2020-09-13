@@ -116,6 +116,21 @@ namespace PointOfSaleStateManagement.Business
             }
         }
 
+        internal bool HasPositiveBalance()
+        {
+            return Balance > 0;
+        }
+
+        internal bool IsCancellable()
+        {
+            return Math.Abs(PaymentBalance) < 0.001;
+        }
+
+        internal bool IsPaid()
+        {
+            return Math.Abs(Balance) < 0.001 && SaleItems.Any() && AmountPaid > 0;
+        }
+
         internal void ReplaceItem(SaleItem existingItem, SaleItem newItem)
         {
             _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
