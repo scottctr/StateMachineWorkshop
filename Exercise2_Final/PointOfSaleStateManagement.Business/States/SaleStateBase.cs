@@ -32,7 +32,7 @@
         {
             var result = Sale.CancelInternal();
             if (result.IsSuccess)
-            { Sale.TransitionTo(new CancelState(Sale)); }
+            { Sale.TransitionTo(new CancelledState(Sale)); }
 
             return result;
         }
