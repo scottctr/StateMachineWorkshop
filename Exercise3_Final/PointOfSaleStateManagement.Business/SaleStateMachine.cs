@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 namespace PointOfSaleStateManagement.Business
 {
-    internal class SaleStateMachine
+    public class SaleStateMachine
     {
         private readonly StateMachine<Sale, SaleState, SaleEvent> _stateMachine;
         private readonly Sale _sale;
@@ -13,10 +13,9 @@ namespace PointOfSaleStateManagement.Business
         public SaleStateMachine(Sale sale)
         {
             _sale = sale;
-
             _stateMachine = new StateMachine<Sale, SaleState, SaleEvent>(
-                stateAccessor: aSale => aSale.State,
-                stateMutator: (aSale, newState) => aSale.State = newState);
+                stateAccessor: sale1 => sale1.State,
+                stateMutator: (sale1, state) => sale1.State = state);
             ConfigureStateMachine();
         }
 
@@ -40,35 +39,35 @@ namespace PointOfSaleStateManagement.Business
             _stateMachine.FireTrigger(_sale, SaleEvent.Cancel);
         }
 
-        internal void DeleteItem(SaleItem item)
+        internal void DeleteItem(SaleItem saleItem)
         {
-            _stateMachine.FireTrigger(_sale, SaleEvent.DeleteItem, item);
+            _stateMachine.FireTrigger(_sale, SaleEvent.DeleteItem, saleItem);
         }
 
-        internal void SetItemQuantity(SaleItem existingItem)
+        internal void SetItemQuantity(SaleItem saleItem)
         {
-            _stateMachine.FireTrigger(_sale, SaleEvent.SetItemQuantity, existingItem);
+            _stateMachine.FireTrigger(_sale, SaleEvent.SetItemQuantity, saleItem);
         }
 
         private void ConfigureStateMachine()
         {
             _stateMachine.ConfigureState(SaleState.Open)
-                .AddTransition(SaleEvent.Pay, SaleState.Paid, _ => _sale.IsPaid())
-                .AddTransition(SaleEvent.Pay, SaleState.Overpaid, condition: _ => _sale.HasPositiveBalance())
-                .AddTransition(SaleEvent.SetItemQuantity, SaleState.Paid, _ => _sale.IsPaid())
-                .AddTransition(SaleEvent.SetItemQuantity, SaleState.Overpaid, condition: _ => _sale.HasPositiveBalance())
-                .AddTransition(SaleEvent.GiveChange, SaleState.Paid, _ => _sale.IsPaid())
                 .AddTransition(SaleEvent.Cancel, SaleState.Cancelled, _ => _sale.IsCancellable())
-                .AddTriggerAction<SaleItem>(SaleEvent.AddItem, (_, item) => _sale.AddSaleItemInternal(item))
-                .AddTriggerAction<SaleItem>(SaleEvent.SetItemQuantity, (_, item) => _sale.SetItemQuantityInternal(item))
-                .AddTriggerAction<SaleItem>(SaleEvent.DeleteItem, (_, item) => _sale.DeleteSaleItemInternal(item))
-                .AddTriggerAction<Payment>(SaleEvent.Pay, (_, payment) => _sale.AddPaymentInternal(payment))
-                .AddTriggerAction<Change>(SaleEvent.GiveChange, (_, change) => ProcessChangeRequest(change))
-                .AddTriggerAction(SaleEvent.Cancel, sale => ProcessCancelRequest());
+                .AddTransition(SaleEvent.SetItemQuantity, SaleState.Overpaid, condition: sale => sale.HasPositiveBalance())
+                .AddTransition(SaleEvent.SetItemQuantity, SaleState.Paid, condition: sale => sale.IsPaid)
+                .AddTransition(SaleEvent.Pay, SaleState.Overpaid, condition: sale => sale.HasPositiveBalance())
+                .AddTransition(SaleEvent.Pay, SaleState.Paid, condition: sale => sale.IsPaid)
+                .AddTransition(SaleEvent.GiveChange, SaleState.Paid, condition: sale => sale.IsPaid)
+                .AddTriggerAction<SaleItem>(SaleEvent.AddItem, (sale, item) => sale.AddItemInternal(item))
+                .AddTriggerAction<SaleItem>(SaleEvent.SetItemQuantity, (sale, item) => sale.SetItemQuantityInternal(item))
+                .AddTriggerAction<SaleItem>(SaleEvent.DeleteItem, (sale, item) => sale.DeleteItemInternal(item))
+                .AddTriggerAction<Payment>(SaleEvent.Pay, (sale, payment) => sale.AddPaymentInternal(payment))
+                .AddTriggerAction<Change>(SaleEvent.GiveChange, (sale, change) => sale.AddChangeInternal(change))
+                .AddTriggerAction(SaleEvent.Cancel, sale => sale.CancelInternal());
 
             _stateMachine.ConfigureState(SaleState.Overpaid)
                 .MakeSubstateOf(_stateMachine.ConfigureState(SaleState.Open))
-                .AddTriggerAction<Payment>(SaleEvent.Pay, (_, payment) => throw new InvalidOperationException("Cannot pay on an overpaid sale"));
+                .AddTriggerAction<Payment>(SaleEvent.Pay, (sale, payment) => throw new InvalidOperationException("Cannot pay on an overpaid sale"));
 
             _stateMachine.ConfigureState(SaleState.Finalized)
                 .AddTriggerAction<SaleItem>(SaleEvent.AddItem, (_, item) => throw new InvalidOperationException("Cannot add item to a finalized sale"))
@@ -78,10 +77,10 @@ namespace PointOfSaleStateManagement.Business
                 .AddTriggerAction<Change>(SaleEvent.GiveChange, (_, change) => throw new InvalidOperationException("Cannot give change on a finalized sale"))
                 .AddTriggerAction(SaleEvent.Cancel, sale => throw new InvalidOperationException("Cannot cancel a finalized sale"));
 
-            _stateMachine.ConfigureState(SaleState.Cancelled)
+            _stateMachine.ConfigureState(SaleState.Paid)
                 .MakeSubstateOf(_stateMachine.ConfigureState(SaleState.Finalized));
 
-            _stateMachine.ConfigureState(SaleState.Paid)
+            _stateMachine.ConfigureState(SaleState.Cancelled)
                 .MakeSubstateOf(_stateMachine.ConfigureState(SaleState.Finalized));
 
 #if DEBUG
@@ -90,20 +89,6 @@ namespace PointOfSaleStateManagement.Business
             Debug.WriteLine(CsvExporter<SaleState, SaleEvent>.Export(configSummary));
             Debug.WriteLine(DotGraphExporter<SaleState, SaleEvent>.Export(configSummary));
 #endif
-        }
-
-        private void ProcessCancelRequest()
-        {
-            if (_sale.PaymentBalance > 0)
-            { throw new InvalidOperationException("Cannot cancel a sale until payments returned"); }
-        }
-
-        private void ProcessChangeRequest(Change change)
-        {
-            if (change.Amount > _sale.PaymentBalance)
-            { throw new InvalidOperationException("Change amount cannot exceed payment balance."); }
-
-            _sale.AddChangeInternal(change);
         }
     }
 }

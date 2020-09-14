@@ -8,69 +8,34 @@ namespace PointOfSaleStateManagement.Business
     {
         private readonly List<Change> _change = new List<Change>();
         private readonly List<Payment> _payments = new List<Payment>();
-        private readonly IList<SaleItem> _saleItems = new List<SaleItem>();
-        private readonly SaleStateMachine _saleStateMachine;
+        private readonly List<SaleItem> _saleItems = new List<SaleItem>();
+        private readonly SaleStateMachine _stateMachine;
 
         public Sale(int id)
         {
             Id = id;
-            _saleStateMachine = new SaleStateMachine(this);
+            _stateMachine = new SaleStateMachine(this);
         }
-
-        public double AmountPaid { get; internal set; }
 
         public ActionResult AddChange(Change change)
         {
-            return ExecuteAction(() => _saleStateMachine.AddChange(change));
+            return change.Amount > PaymentBalance
+                ? new ActionResult(isSuccess: false, "Change amount cannot exceed payment balance")
+                : ExecuteAction(() => _stateMachine.AddChange(change));
+        }
+
+        internal void AddChangeInternal(Change change)
+        {
+            _change.Add(change);
+            UpdateAmounts();
         }
 
         public ActionResult AddItem(SaleItem newItem)
         {
-            return ExecuteAction(() => _saleStateMachine.AddItem(newItem));
+            return ExecuteAction(() => _stateMachine.AddItem(newItem));
         }
 
-        public ActionResult AddPayment(Payment payment)
-        {
-            return ExecuteAction(() => _saleStateMachine.AddPayment(payment));
-        }
-        public double Balance { get; internal set; }
-
-        public ActionResult Cancel()
-        {
-            return ExecuteAction(() => _saleStateMachine.Cancel());
-        }
-
-        public double ChangeGiven { get; internal set; }
-
-        public ActionResult DeleteItem(int productId)
-        {
-            return ExecuteAction(() => _saleStateMachine.DeleteItem(_saleItems.FirstOrDefault(i => i.Product.Id == productId)));
-        }
-
-        public int Id { get; }
-
-        public bool IsComplete => State == SaleState.Paid || State == SaleState.Cancelled;
-
-        public double PaymentBalance => AmountPaid - ChangeGiven;
-
-        public IReadOnlyList<SaleItem> SaleItems => _saleItems as IReadOnlyList<SaleItem>;
-
-        public ActionResult SetItemQuantity(int productId, int newQuantity)
-        {
-            var existingItem = _saleItems.FirstOrDefault(i => i.Product.Id == productId);
-
-            return existingItem is null 
-                ? new ActionResult(isSuccess: false, $"ProductId {productId} not found in sale items.") 
-                : ExecuteAction(() => _saleStateMachine.SetItemQuantity(new SaleItem(existingItem.Product, newQuantity)));
-        }
-
-        public SaleState State { get; internal set; }
-
-        public double SubTotal { get; set; }
-
-        public int TotalItems { get; internal set; }
-
-        internal void AddSaleItemInternal(SaleItem newItem)
+        internal void AddItemInternal(SaleItem newItem)
         {
             var existingItem = SaleItems.FirstOrDefault(i => i.Product.Id == newItem.Product.Id);
 
@@ -85,10 +50,11 @@ namespace PointOfSaleStateManagement.Business
             UpdateAmounts();
         }
 
-        internal void AddChangeInternal(Change change)
+        public ActionResult AddPayment(Payment payment)
         {
-            _change.Add(change);
-            UpdateAmounts();
+            return Balance >= 0
+                ? new ActionResult(isSuccess: false, "Cannot add payment to sale with balance equal or greater than 0")
+                : ExecuteAction(() => _stateMachine.AddPayment(payment));
         }
 
         internal void AddPaymentInternal(Payment payment)
@@ -97,11 +63,69 @@ namespace PointOfSaleStateManagement.Business
             UpdateAmounts();
         }
 
-        internal void DeleteSaleItemInternal(SaleItem item)
+        public double AmountPaid { get; private set; }
+
+        public double Balance { get; private set; }
+
+        public ActionResult Cancel()
         {
-            _saleItems.Remove(item);
+            return PaymentBalance > ChangeGiven
+                ? new ActionResult(isSuccess: false, "Cannot cancel sale until payments returned")
+                : ExecuteAction(() => _stateMachine.Cancel());
+        }
+
+        internal void CancelInternal()
+        {
+            // Checks done in public method
+        }
+
+        public double ChangeGiven { get; private set; }
+
+        public ActionResult DeleteItem(int productId)
+        {
+            return ExecuteAction(() => _stateMachine.DeleteItem(_saleItems.FirstOrDefault(i => i.Product.Id == productId)));
+        }
+
+        internal void DeleteItemInternal(SaleItem item)
+        {
+            _saleItems.Remove(SaleItems.FirstOrDefault(i => i.Product.Id == item.Product.Id));
             UpdateAmounts();
         }
+
+        public int Id { get; }
+
+        public bool IsCancelled => State == SaleState.Cancelled;
+
+        public bool IsComplete => IsPaid || IsCancelled;
+
+        public bool IsPaid => Math.Abs(Balance) < .001 && _payments.Any() && SaleItems.Any(i => i.Quantity > 0);
+
+        public double PaymentBalance => AmountPaid - ChangeGiven;
+
+        public ActionResult SetItemQuantity(int productId, int newQuantity)
+        {
+            var existingItem = _saleItems.FirstOrDefault(i => i.Product.Id == productId);
+
+            return existingItem is null
+                ? new ActionResult(isSuccess: false, $"ProductId {productId} not found in sale items.")
+                : ExecuteAction(() => _stateMachine.SetItemQuantity(new SaleItem(existingItem.Product, newQuantity)));
+        }
+
+        internal void SetItemQuantityInternal(SaleItem item)
+        {
+            ReplaceItem(_saleItems.FirstOrDefault(i => i.Product.Id == item.Product.Id), item);
+            UpdateAmounts();
+        }
+
+        public SaleState State { get; internal set; }
+
+        public string Status => State.ToString();
+
+        public double SubTotal { get; set; }
+
+        public IReadOnlyList<SaleItem> SaleItems => _saleItems.AsReadOnly();
+
+        public int TotalItems { get; private set; }
 
         private static ActionResult ExecuteAction(Action action)
         {
@@ -126,23 +150,12 @@ namespace PointOfSaleStateManagement.Business
             return Math.Abs(PaymentBalance) < 0.001;
         }
 
-        internal bool IsPaid()
-        {
-            return Math.Abs(Balance) < 0.001 && SaleItems.Any() && AmountPaid > 0;
-        }
-
-        internal void ReplaceItem(SaleItem existingItem, SaleItem newItem)
+        private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
         {
             _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
         }
 
-        internal void SetItemQuantityInternal(SaleItem updatedItem)
-        {
-            ReplaceItem(SaleItems.First(i => i.Product.Id == updatedItem.Product.Id), updatedItem);
-            UpdateAmounts();
-        }
-
-        internal void UpdateAmounts()
+        private void UpdateAmounts()
         {
             UpdateTotalItems();
             UpdateSubTotal();
@@ -168,12 +181,12 @@ namespace PointOfSaleStateManagement.Business
 
         private void UpdateSubTotal()
         {
-            SubTotal = _saleItems.Sum(i => i.TotalPrice);
+            SubTotal = SaleItems.Sum(i => i.TotalPrice);
         }
 
         private void UpdateTotalItems()
         {
-            TotalItems = _saleItems.Sum(i => i.Quantity);
+            TotalItems = SaleItems.Sum(i => i.Quantity);
         }
     }
 }

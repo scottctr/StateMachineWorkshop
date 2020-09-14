@@ -142,6 +142,16 @@ namespace PointOfSaleStateManagement.Business
 
         public int TotalItems { get; private set; }
 
+        internal bool HasPositiveBalance()
+        {
+            return Balance > 0;
+        }
+
+        internal bool IsCancellable()
+        {
+            return Math.Abs(PaymentBalance) < 0.001;
+        }
+
         private void ReplaceItem(SaleItem existingItem, SaleItem newItem)
         {
             _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
