@@ -2,9 +2,9 @@
 
 namespace PointOfSaleStateManagement.Business.States
 {
-    public class OverpaidState : SaleStateBase
+    public class OverpaidState : OpenState
     {
-        public OverpaidState(Sale context) : base("Overpaid", context, isFinalState: false)
+        public OverpaidState(Sale context) : base(context, "Overpaid")
         {
             throw new NotImplementedException();
         }

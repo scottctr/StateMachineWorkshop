@@ -140,6 +140,11 @@ namespace PointOfSaleStateManagement.Business
             }
         }
 
+        internal bool HasNegativeBalance()
+        {
+            return Balance < 0;
+        }
+
         internal bool HasPositiveBalance()
         {
             return Balance > 0;

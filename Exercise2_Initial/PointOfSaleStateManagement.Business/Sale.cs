@@ -143,6 +143,11 @@ namespace PointOfSaleStateManagement.Business
             Status = "Overpaid";
         }
 
+        internal void TransitionTo(SaleStateBase newState)
+        {
+            _state = newState;
+        }
+
         public string Status { get; private set; } = "Open";
 
         public double SubTotal { get; set; }

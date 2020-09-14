@@ -2,9 +2,9 @@
 
 namespace PointOfSaleStateManagement.Business.States
 {
-    public class PaidState : SaleStateBase
+    public class PaidState : FinalizedState
     {
-        public PaidState(Sale context) : base("Paid", context, isFinalState: true)
+        public PaidState(Sale context) : base(context, "Paid")
         {
             throw new NotImplementedException();
         }

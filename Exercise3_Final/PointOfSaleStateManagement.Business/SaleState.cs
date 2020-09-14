@@ -4,7 +4,7 @@
     {
         Open,
         Overpaid,
-        Finalized, // Base state for all final states to prevent duplicating code
+        Finalized,
         Cancelled,
         Paid
     }

@@ -2,9 +2,9 @@
 
 namespace PointOfSaleStateManagement.Business.States
 {
-    public class OpenState : SaleStateBase
+    public class FinalizedState : SaleStateBase
     {
-        public OpenState(Sale context, string statusName = "Open") : base(statusName, context, isFinalState: false)
+        public FinalizedState(Sale context, string statusName) : base(statusName, context, isFinalState: true)
         {
             throw new NotImplementedException();
         }

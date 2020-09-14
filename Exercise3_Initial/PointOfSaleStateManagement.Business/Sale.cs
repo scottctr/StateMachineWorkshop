@@ -142,6 +142,11 @@ namespace PointOfSaleStateManagement.Business
 
         public int TotalItems { get; private set; }
 
+        internal bool HasNegativeBalance()
+        {
+            return Balance < 0;
+        }
+
         internal bool HasPositiveBalance()
         {
             return Balance > 0;

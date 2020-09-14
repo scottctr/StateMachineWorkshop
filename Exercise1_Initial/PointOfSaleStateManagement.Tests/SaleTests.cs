@@ -286,6 +286,7 @@ namespace PointOfSaleStateManagement.Tests
             var result = sut.Cancel();
 
             Assert.True(result.IsSuccess, "Was unable to cancel open sale");
+            // TODO Need Sale.IsCancelled
             Assert.True(false /*TODO isCancelled*/, "Successfully cancelled sale not marked cancelled");
         }
 
@@ -300,6 +301,7 @@ namespace PointOfSaleStateManagement.Tests
             var result = sut.Cancel();
 
             Assert.False(result.IsSuccess, "Cancelled sale with a payment balance");
+            // TODO Need Sale.IsCancelled
             Assert.False(false /*TODO isCancelled*/, "Successfully cancelled sale not marked cancelled");
         }
 

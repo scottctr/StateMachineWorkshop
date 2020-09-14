@@ -2,9 +2,9 @@
 
 namespace PointOfSaleStateManagement.Business.States
 {
-    public class CancelledState : SaleStateBase
+    public class CancelledState : FinalizedState
     {
-        public CancelledState(Sale context) : base("Cancelled", context, isFinalState: true)
+        public CancelledState(Sale context) : base(context, "Cancelled")
         {
             throw new NotImplementedException();
         }
