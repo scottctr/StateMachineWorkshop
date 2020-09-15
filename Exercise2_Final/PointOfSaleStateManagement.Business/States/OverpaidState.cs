@@ -1,11 +1,14 @@
 ﻿namespace PointOfSaleStateManagement.Business.States
 {
-    public class OverpaidState : OpenState
+    internal class OverpaidState : OpenState
     {
-        public OverpaidState(Sale context) : base(context, "Overpaid")
+        internal OverpaidState(Sale context) : base(context, "Overpaid")
         { }
 
-        public override ActionResult AddChange(Change change)
+        // Only overriding the methods that have Overpaid specific logic for processing or transitions
+        // -- Giving change or adding items could cause the sale to go to Open or Paid
+
+        internal override ActionResult AddChange(Change change)
         {
             var result = base.AddChange(change);
             if (result.IsSuccess)
@@ -14,7 +17,7 @@
             return result;
         }
 
-        public override ActionResult AddItem(SaleItem newItem)
+        internal override ActionResult AddItem(SaleItem newItem)
         {
             var result = base.AddItem(newItem);
             if (result.IsSuccess)
@@ -23,7 +26,7 @@
             return result;
         }
 
-        public override ActionResult SetItemQuantity(int productId, int newQuantity)
+        internal override ActionResult SetItemQuantity(int productId, int newQuantity)
         {
             var result = base.SetItemQuantity(productId, newQuantity);
             if (result.IsSuccess)

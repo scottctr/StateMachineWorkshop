@@ -17,12 +17,18 @@ namespace PointOfSaleStateManagement.Business
             _stateMachine = new SaleStateMachine(this);
         }
 
+        // All of Sale's action methods now forward all calls to the SaleStateMachine after checking any non-state rules
+        // Note that SaleStateMachine throws exceptions if the call isn't successful so Sale has to catch those exceptions and return an appropriate ActionResult
+        // - ExecuteAction handles the calls SaleStateMachine and creates the ActionResult 
+
         public ActionResult AddChange(Change change)
         {
             return change.Amount > PaymentBalance
                 ? new ActionResult(isSuccess: false, "Change amount cannot exceed payment balance")
                 : ExecuteAction(() => _stateMachine.AddChange(change));
         }
+
+        // The core Sale logic has now been moved to Internal method so it's still encapsulated as part of Sale and SaleStateMachine can call it
 
         internal void AddChangeInternal(Change change)
         {
@@ -76,7 +82,7 @@ namespace PointOfSaleStateManagement.Business
 
         internal void CancelInternal()
         {
-            // Checks done in public method
+            // All checks done in public method before state machine so nothing to do here
         }
 
         public double ChangeGiven { get; private set; }
@@ -118,8 +124,6 @@ namespace PointOfSaleStateManagement.Business
         }
 
         public SaleState State { get; internal set; }
-
-        public string Status => State.ToString();
 
         public double SubTotal { get; set; }
 

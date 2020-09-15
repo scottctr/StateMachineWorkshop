@@ -1,8 +1,12 @@
 ﻿namespace PointOfSaleStateManagement.Business.States
 {
-    public class PaidState : FinalState
+    internal class PaidState : FinalState
     {
-        public PaidState(Sale context) : base("Paid", context)
+        internal PaidState(Sale context) : base("Paid", context)
         { }
+
+
+        // No changes from Final state so no overrides here
+        // - Only difference in Paid and Cancelled final states is how the sale is transitioned to each state
     }
 }

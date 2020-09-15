@@ -19,7 +19,8 @@
 8. Need to be able to cancel a sale
    a. If payments on sale, must give change for total payment amounts before cancelling
       - This negates rule 2: “Can only give change when balance > 0”
-   b. No changes to cancelled sales
+   b. Change amount can't exceed payment balance
+   c. No changes to cancelled sales
       - Can’t modify items, add payments, give change, or cancel
 9. Can’t create a new sale until current sale is paid or cancelled
 - Implementation note: Set Index.cs/IncludeCancel = true

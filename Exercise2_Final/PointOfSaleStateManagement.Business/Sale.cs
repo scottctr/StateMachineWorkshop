@@ -17,16 +17,24 @@ namespace PointOfSaleStateManagement.Business
         public Sale(int id)
         {
             Id = id;
+
+            // Initializing the Sale to the Open state
+            // - Need to persist current state and initialize appropriately in real app
             TransitionTo(new OpenState(this));
         }
+
+        // All action methods now forward request to the current state
 
         public ActionResult AddChange(Change change)
         {
             return _state.AddChange(change);
         }
 
+        // The previous action methods have been converted to internal methods that are called by the state classes
+
         internal ActionResult AddChangeInternal(Change change)
         {
+            // Non-state rules (i.e. invariant rules) are still encapsulated in the core Sale logic
             if (change.Amount > PaymentBalance)
             { return new ActionResult(isSuccess: false, "Change amount cannot exceed payment balance"); }
 
@@ -83,10 +91,9 @@ namespace PointOfSaleStateManagement.Business
 
         internal ActionResult CancelInternal()
         {
-            if (_payments.Sum(p => p.Amount) > _change.Sum(c => c.Amount))
-            { return new ActionResult(isSuccess: false, "Cannot cancel sale until payments returned"); }
-
-            return new ActionResult(isSuccess: true);
+            return _payments.Sum(p => p.Amount) > _change.Sum(c => c.Amount) 
+                ? new ActionResult(isSuccess: false, "Cannot cancel sale until payments returned") 
+                : new ActionResult(isSuccess: true);
         }
 
         public double ChangeGiven { get; private set; }
@@ -146,6 +153,8 @@ namespace PointOfSaleStateManagement.Business
         {
             _saleItems[_saleItems.IndexOf(existingItem)] = newItem;
         }
+
+        // Used by the state classes to transition the Sale's current state
 
         internal void TransitionTo(SaleStateBase newState)
         {

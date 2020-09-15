@@ -21,36 +21,6 @@ namespace PointOfSaleStateManagement.Business
             ConfigureStateMachine();
         }
 
-        internal void AddChange(Change change)
-        {
-            _stateMachine.FireTrigger(_sale, SaleEvent.GiveChange, change);
-        }
-
-        internal void AddItem(SaleItem newItem)
-        {
-            _stateMachine.FireTrigger(_sale, SaleEvent.AddItem, newItem);
-        }
-
-        internal void AddPayment(Payment payment)
-        {
-            _stateMachine.FireTrigger(_sale, SaleEvent.Pay, payment);
-        }
-
-        internal void Cancel()
-        {
-            _stateMachine.FireTrigger(_sale, SaleEvent.Cancel);
-        }
-
-        internal void DeleteItem(SaleItem saleItem)
-        {
-            _stateMachine.FireTrigger(_sale, SaleEvent.DeleteItem, saleItem);
-        }
-
-        internal void SetItemQuantity(SaleItem saleItem)
-        {
-            _stateMachine.FireTrigger(_sale, SaleEvent.SetItemQuantity, saleItem);
-        }
-
         private void ConfigureStateMachine()
         {
             // Use builder pattern to configure each state
@@ -103,6 +73,40 @@ namespace PointOfSaleStateManagement.Business
             Debug.WriteLine(DotGraphExporter<SaleState, SaleEvent>.Export(configSummary));
             // Plug the output of the DotGraphExporter into https://dreampuf.github.io/GraphvizOnline to see graph of current configuration
 #endif
+        }
+
+        // Internal methods for Sale to forward actions to
+        // - _stateMachine.FireTrigger processes each request based on the configuration above
+        // - All of the calls to FireTrigger use the optional 'request' parameter, except Cancel
+
+        internal void AddChange(Change change)
+        {
+            _stateMachine.FireTrigger(_sale, SaleEvent.GiveChange, change);
+        }
+
+        internal void AddItem(SaleItem newItem)
+        {
+            _stateMachine.FireTrigger(_sale, SaleEvent.AddItem, newItem);
+        }
+
+        internal void AddPayment(Payment payment)
+        {
+            _stateMachine.FireTrigger(_sale, SaleEvent.Pay, payment);
+        }
+
+        internal void Cancel()
+        {
+            _stateMachine.FireTrigger(_sale, SaleEvent.Cancel);
+        }
+
+        internal void DeleteItem(SaleItem saleItem)
+        {
+            _stateMachine.FireTrigger(_sale, SaleEvent.DeleteItem, saleItem);
+        }
+
+        internal void SetItemQuantity(SaleItem saleItem)
+        {
+            _stateMachine.FireTrigger(_sale, SaleEvent.SetItemQuantity, saleItem);
         }
     }
 }

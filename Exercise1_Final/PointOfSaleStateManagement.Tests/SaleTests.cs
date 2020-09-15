@@ -128,7 +128,6 @@ namespace PointOfSaleStateManagement.Tests
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
             sut.AddPayment(new Payment(50));
-            var expectedBalance = sut.Balance;
 
             var result = sut.AddChange(new Change(50));
 
@@ -286,7 +285,7 @@ namespace PointOfSaleStateManagement.Tests
         }
 
         [Fact]
-        public void Test_8b_cannot_add_items_on_cancelled_sale()
+        public void Test_8c_cannot_add_items_on_cancelled_sale()
         {
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
@@ -300,7 +299,7 @@ namespace PointOfSaleStateManagement.Tests
         }
 
         [Fact]
-        public void Test_8b_cannot_change_item_quantity_on_cancelled_sale()
+        public void Test_8c_cannot_change_item_quantity_on_cancelled_sale()
         {
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
@@ -314,7 +313,7 @@ namespace PointOfSaleStateManagement.Tests
         }
 
         [Fact]
-        public void Test_8b_cannot_delete_item_on_cancelled_sale()
+        public void Test_8c_cannot_delete_item_on_cancelled_sale()
         {
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
@@ -328,7 +327,7 @@ namespace PointOfSaleStateManagement.Tests
         }
 
         [Fact]
-        public void Test_8b_cannot_pay_on_cancelled_sale()
+        public void Test_8c_cannot_pay_on_cancelled_sale()
         {
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
@@ -342,7 +341,7 @@ namespace PointOfSaleStateManagement.Tests
         }
 
         [Fact]
-        public void Test_8b_cannot_give_change_to_cancelled_sale()
+        public void Test_8c_cannot_give_change_to_cancelled_sale()
         {
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
@@ -356,7 +355,21 @@ namespace PointOfSaleStateManagement.Tests
         }
 
         [Fact]
-        public void Test_8b_cannot_cancel_cancelled_sale()
+        public void Test_8b_change_amount_cannot_exceed_payment_balance()
+        {
+            var sut = new Sale(1);
+            var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 10.11, imageClassName: "test"), 1);
+            sut.AddItem(item1);
+            sut.AddPayment(new Payment(5));
+
+            var result = sut.AddChange(new Change(6.00));
+
+            Assert.False(result.IsSuccess, "Added change that exceeds payment balance");
+            Assert.Equal(0, sut.ChangeGiven);
+        }
+
+        [Fact]
+        public void Test_8c_cannot_cancel_cancelled_sale()
         {
             var sut = new Sale(1);
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.11, imageClassName: "test"), 1);
