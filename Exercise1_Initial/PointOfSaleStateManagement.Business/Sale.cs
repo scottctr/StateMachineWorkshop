@@ -53,6 +53,8 @@ namespace PointOfSaleStateManagement.Business
 
         public ActionResult Cancel()
         {
+            //TODO Cancel not fully implemented
+
             UpdateAmounts();
 
             return new ActionResult(isSuccess: false, "Not implemented"); //TODO Cancel not implemented
