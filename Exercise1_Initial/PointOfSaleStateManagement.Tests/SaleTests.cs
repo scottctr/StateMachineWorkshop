@@ -132,7 +132,6 @@ namespace PointOfSaleStateManagement.Tests
             var item1 = new SaleItem(new Product(1, "product1", "product1", "product1s", 1.00, imageClassName: "test"), 1);
             sut.AddItem(item1);
             sut.AddPayment(new Payment(50));
-            var expectedBalance = sut.Balance;
 
             var result = sut.AddChange(new Change(50));
 

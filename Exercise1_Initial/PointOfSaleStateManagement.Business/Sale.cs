@@ -53,6 +53,8 @@ namespace PointOfSaleStateManagement.Business
 
         public ActionResult Cancel()
         {
+            UpdateAmounts();
+
             return new ActionResult(isSuccess: false, "Not implemented"); //TODO Cancel not implemented
         }
 
@@ -89,7 +91,7 @@ namespace PointOfSaleStateManagement.Business
 
         public string Status { get; private set; }
 
-        public double SubTotal { get; set; }
+       public double SubTotal { get; set; }
 
         public int TotalItems { get; private set; }
 

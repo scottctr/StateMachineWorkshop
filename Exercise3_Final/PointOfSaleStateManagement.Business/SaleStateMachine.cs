@@ -31,7 +31,6 @@ namespace PointOfSaleStateManagement.Business
                 .AddTransition(SaleEvent.SetItemQuantity, SaleState.Paid, condition: sale => sale.IsPaid)
                 .AddTransition(SaleEvent.Pay, SaleState.Overpaid, condition: sale => sale.HasPositiveBalance())
                 .AddTransition(SaleEvent.Pay, SaleState.Paid, condition: sale => sale.IsPaid)
-                .AddTransition(SaleEvent.GiveChange, SaleState.Paid, condition: sale => sale.IsPaid)
                 // Add trigger actions -- how to process requests passed from Sale
                 // - Include parameter type where required
                 .AddTriggerAction<SaleItem>(SaleEvent.AddItem, (sale, item) => sale.AddItemInternal(item))

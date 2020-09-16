@@ -1,5 +1,6 @@
 ﻿namespace PointOfSaleStateManagement.Business.States
 {
+    // Derived from OpenState
     internal class OverpaidState : OpenState
     {
         internal OverpaidState(Sale context) : base(context, "Overpaid")
