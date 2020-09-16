@@ -25,3 +25,15 @@
   -- i.e. don't worry about adding the constraints to the UI for today's exercises
 - When rules are violated return an ActionResult with IsSuccess = false and a meaningful error message
   -- Otherwise just return an ActionResult with IsSuccess = true
+- There are 6 key Sale.cs methods used to implement the POS functionality
+  1. public ActionResult AddChange(Change change)
+  2. public ActionResult AddItem(SaleItem newItem)
+  3. public ActionResult AddPayment(Payment payment)
+  4. public ActionResult Cancel()
+  5. public ActionResult DeleteItem(int productId)
+  6. public ActionResult SetItemQuantity(int productId, int newQuantity)
+- Sale.cs properties and fields that will help implement the new rules
+  -- public double Balance { get; private set; }
+  -- public double PaymentBalance => AmountPaid - ChangeGiven;
+  -- public IReadOnlyList<SaleItem> SaleItems => _saleItems.AsReadOnly();
+  -- private readonly List<Payment> _payments = new List<Payment>();

@@ -35,4 +35,16 @@
 - To help ensure rules are implemented correctly
   -- All unit tests should pass once rules implemented
   -- There is a log at the bottom of the UI to help trace what's happened with the current sale
-  -- If you implement state flags as I've done, you can uncomment lines 17 - 20 in Index.razor to see status changes as you modify the sale
+- There are 6 key Sale.cs methods used to implement the POS functionality
+  1. public ActionResult AddChange(Change change)
+  2. public ActionResult AddItem(SaleItem newItem)
+  3. public ActionResult AddPayment(Payment payment)
+  4. public ActionResult Cancel()
+  5. public ActionResult DeleteItem(int productId)
+  6. public ActionResult SetItemQuantity(int productId, int newQuantity)
+- Sale.cs properties and fields that will help implement the new rules
+  -- public double Balance { get; private set; }
+  -- public double PaymentBalance => AmountPaid - ChangeGiven;
+  -- public IReadOnlyList<SaleItem> SaleItems => _saleItems.AsReadOnly();
+  -- private readonly List<Payment> _payments = new List<Payment>();
+- Don't forget to address the TODOs
