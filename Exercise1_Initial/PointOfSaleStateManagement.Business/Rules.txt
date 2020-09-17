@@ -16,7 +16,10 @@
 6. Can only give change if customer has over paid
 7. No changes to paid sales
    - Paid = 0 balance, 1+ items, 1+ payments
-
+- Display current sale status
+  -- “Open”		: initial status (and doesn’t meet criteria for other states)
+  -- “Overpaid”	: Balance > 0
+  -- “Paid”		: Balance = 0, 1+ items, 1+ payments
 
 ************************
 * Implementation Notes *

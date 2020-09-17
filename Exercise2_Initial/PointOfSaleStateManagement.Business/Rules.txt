@@ -23,7 +23,11 @@
    c. No changes to cancelled sales
       - Can’t modify items, add payments, give change, or cancel
 9. Can’t create a new sale until current sale is paid or cancelled
-- Implementation note: Set Index.cs/IncludeCancel = true
+- Display current sale status
+  -- “Open”		    : initial status (and doesn’t meet criteria for other states)
+  -- “Overpaid”	    : Balance > 0
+  -- “Paid”		    : Balance = 0, 1+ items, 1+ payments
+  -- "Cancelled"    : Sale was cancelled
 
 ************************
 * Implementation Notes *
