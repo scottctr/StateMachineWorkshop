@@ -27,6 +27,13 @@
             return result;
         }
 
+        // Payments not allowed in Overpaid state
+
+        internal override ActionResult AddPayment(Payment payment)
+        {
+            return new ActionResult(isSuccess: false, "Payments not allowed in Overpaid state");
+        }
+
         internal override ActionResult SetItemQuantity(int productId, int newQuantity)
         {
             var result = base.SetItemQuantity(productId, newQuantity);
