@@ -1,0 +1,153 @@
+﻿-> https://github.com/scottctr/StateMachineWorkshop
+
+>>> *** Increase font *** <<<
+
+"Can only accept payment if balance less than zero"
+            if (Balance >= 0)
+            { return new ActionResult(isSuccess: false, "Can only accept payment if balance less than 0"); }
+
+"Can only give change if customer over paid"
+            if (Balance <= 0)
+            { return new ActionResult(isSuccess: false, "Can only give change if customer over paid"); }
+
+"No changes can be made to paid sales"
+        public bool IsPaid => Balance == 0 && SaleItems.Any() && _payments.Any();
+
+            if (IsPaid)
+            { return new ActionResult(isSuccess: false, "No changes can be made to a paid sale"); }
+-> Update 6 action methods
+
+"Display current sale status"
+-> Set initial status to Open
+        private void SetStatus()
+        {
+            if (IsPaid)
+            {
+                Status = "Paid";
+            }
+            else if (Balance > 0)
+            {
+                Status = "Overpaid";
+            }
+            else
+            {
+                Status = "Open";
+            }
+        }
+-> SetStatus in UpdateAmounts
+
+*** -> Run app to test changes
+-> TEST PLAN
+  -- Can only accept payment if balance less than zero
+     1. Note new sale is "Open"
+     2. Using 1st new sale
+	 3. Add payment -> **Should fail
+	 4. Add $10 fuel
+	 5. Add $20 payment
+	 6. Note that sale is "Overpaid"
+	 6. Add payment -> ** should fail
+  -- Can only give change if customer over paid
+     1. Give $10 change to complete previous sale
+	 2. Note that sale is "Paid"
+     3. Start new sale
+     4. Give change -> *** should fail
+     5. Add $20 fuel
+	 6. Add $10 payment
+     7. Note that sale is still "Open"	 
+	 8. Give $10 change -> *** should fail
+  -- No changes can be made to paid sales
+     1. Add $10 payment to complete previous sale
+	 2. Note that sale is now "Paid"
+	 3. Add item -> ***should fail
+	 4. Change quantity -> ***should fail
+	 5. Delete item -> ***should fail
+	 6. Add payment -> ***should fail
+	 7. Add change -> ***should fail
+  -- Display current sale status
+     -> Tested in previous steps
+
+
+*** Phone call about Cancel
+
+"If payments on sale, must give change for payment balance before cancelling"
+            if (PaymentBalance > 0)
+            { return new ActionResult(isSuccess: false, "Must give change for remaining payment balance before cancelling"); }
+			
+"This negates previous rule - Can only give change if customer over paid"
+-> Remove: AddChange/if (Balance > 0)
+
+"Change amount cannot exceed payment balance"
+            if (change.Amount > PaymentBalance)
+            { return new ActionResult(isSuccess: false, "Change amount cannot exceed payment balance"); }
+
+
+"No changes allowed to cancelled sales"
+        public bool IsCancelled { get; private set; }
+
+            if (IsPaid || IsCancelled)
+            { return new ActionResult(isSuccess: false, "No changes can be made to a paid or cancelled sale"); }
+
+-> Update all 6 action methods
+
+"Can’t create a new sale until current sale is paid or cancelled"
+        public bool IsComplete => IsCancelled || IsPaid; //Sale only complete when paid or cancelled
+
+"Display “Cancelled” for status of cancelled sales"
+        private void SetStatus()
+        {
+            if (IsCancelled)
+            {
+                Status = "Cancelled";
+            }
+            else if (IsPaid)
+            {
+                Status = "Paid";
+            }
+            else if (Balance > 0)
+            {
+                Status = "Overpaid";
+            }
+            else
+            {
+                Status = "Open";
+            }
+        }
+
+-> TODOs
+
+-> Run unit tests
+
+-> Optional: Run app to test changes
+-> TEST PLAN
+  -- If payments on sale, must give change for payment balance before cancelling
+     1. Add $20 fuel
+	 2. Add $10 payment
+	 3. Cancel -> *** should fail
+	 4. Add $10 change
+	 5. Cancel -> Should succeed
+  -- This negates previous rule - Can only give change if customer over paid
+     -> Previous test proved that we handled this correctly
+  -- Change amount cannot exceed payment balance
+     1. Start new sale
+	 2. Add $20 fuel
+	 3. Add $10 payment
+	 4. Add $555 change -> ***should fail
+  -- No changes allowed to cancelled sales
+     1. Add $10 change to previous sale
+	 2. Cancel -> should succeed
+	 3. Note that sale is "Cancelled"
+	 4. Add item -> ***should fail
+	 5. Change quantity -> ***should fail
+	 6. Delete item -> ***should fail
+	 7. Add payment -> ***should fail
+	 8. Add change -> ***should fail
+	 9. Cancel -> ***should fail
+  -- Can’t create a new sale until current sale is paid or cancelled
+     1. Start new sale
+	 2. Note that able to start new sale as expected -- didn't break item
+     3. Start new sale -> *** should fail since this sale is Open
+  -- Display “Cancelled” for status of cancelled sales
+     -> Test above
+	 
+
+
